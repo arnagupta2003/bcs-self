@@ -163,7 +163,7 @@ class Snowball(bs.Actor):
             0.26: self.radius
         })
         if self.snowball_melt:
-            bs.timer(1.5, bs.WeakCall(self._disappear))
+            bs.timer(1.5, babase.WeakCallPartial(self._disappear))
 
     def hit(self) -> None:
         if not self.node:
@@ -173,7 +173,7 @@ class Snowball(bs.Actor):
         if self.snowball_explode:
             self._exploded = True
             self.do_explode()
-            bs.timer(0.001, bs.WeakCall(self.handlemessage, bs.DieMessage()))
+            bs.timer(0.001, babase.WeakCallPartial(self.handlemessage, bs.DieMessage()))
         else:
             self.do_hit()
 
@@ -200,7 +200,7 @@ class Snowball(bs.Actor):
                         hit_subtype='default'))
 
         if not self.snowball_bounce:
-            bs.timer(0.05, bs.WeakCall(self.do_bounce))
+            bs.timer(0.05, babase.WeakCallPartial(self.do_bounce))
 
     def do_explode(self) -> None:
         Blast(position=self.node.position,
@@ -217,7 +217,7 @@ class Snowball(bs.Actor):
             return
         if not self.snowball_bounce:
             vel = self.node.velocity
-            bs.timer(0.01, bs.WeakCall(self.calc_bounce, vel))
+            bs.timer(0.01, babase.WeakCallPartial(self.calc_bounce, vel))
         else:
             return
 
@@ -227,7 +227,7 @@ class Snowball(bs.Actor):
         ospd = babase.Vec3(*vel).length()
         dot = sum(x*y for x, y in zip(vel, self.node.velocity))
         if ospd*ospd - dot > 50.0:
-            bs.timer(0.05, bs.WeakCall(self.do_bounce))
+            bs.timer(0.05, babase.WeakCallPartial(self.do_bounce))
 
     def do_bounce(self) -> None:
         if not self.node:
@@ -258,7 +258,7 @@ class Snowball(bs.Actor):
             0.05: 0.0
         })
         bs.timer(0.08,
-                 bs.WeakCall(self.handlemessage, bs.DieMessage()))
+                 babase.WeakCallPartial(self.handlemessage, bs.DieMessage()))
 
     def _disappear(self) -> None:
         self._exploded = True
@@ -276,7 +276,7 @@ class Snowball(bs.Actor):
                 0.5: 0.0
             })
             bs.timer(0.55,
-                     bs.WeakCall(self.handlemessage, bs.DieMessage()))
+                     babase.WeakCallPartial(self.handlemessage, bs.DieMessage()))
 
     def handlemessage(self, msg: Any) -> Any:
         if isinstance(msg, bs.DieMessage):
@@ -330,7 +330,7 @@ class NewPlayerSpaz(PlayerSpaz):
             if not self.node.hold_node:
                 bs.timer(
                     0.1,
-                    bs.WeakCall(self._safe_play_sound,
+                    babase.WeakCallPartial(self._safe_play_sound,
                                 SpazFactory.get().swish_sound, 0.8))
         self._turbo_filter_add_press('punch')
 

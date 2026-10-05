@@ -18,7 +18,7 @@ from typing import TYPE_CHECKING
 
 import babase
 import bascenev1 as bs
-from babase._mgen.enums import InputType
+from babase import InputType
 from bascenev1lib.actor.bomb import Blast
 
 from bascenev1lib.gameutils import SharedObjects
@@ -331,9 +331,9 @@ class Rocket(bs.Actor):
                                         self.node.velocity[2] * 200)
 
         self._life_timer = bs.Timer(
-            5, bs.WeakCall(self.handlemessage, bs.DieMessage()))
+            5, babase.WeakCallPartial(self.handlemessage, bs.DieMessage()))
 
-        self._emit_timer = bs.Timer(0.001, bs.WeakCall(self.emit), repeat=True)
+        self._emit_timer = bs.Timer(0.001, babase.WeakCallPartial(self.emit), repeat=True)
         self.base_pos_y = self.node.position[1]
 
         bs.camerashake(5.0)
@@ -405,7 +405,7 @@ class ChooseQueen(DeathMatchGame):
             conditions=('they_have_material', shared.player_material),
             actions=(
                 ('modify_part_collision', 'collide', True),
-                ('call', 'at_connect', babase.Call(self._handle_player_collide)),
+                ('call', 'at_connect', babase.CallPartial(self._handle_player_collide)),
             ),
         )
         pos = (0, 0.1, -5)

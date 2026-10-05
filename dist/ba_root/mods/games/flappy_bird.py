@@ -98,7 +98,7 @@ class FlappyBirdGame(MeteorShowerGame):
             actions=(
                 ('modify_part_collision', 'collide', True),
                 ('modify_part_collision', 'physical', True),
-                ('call', 'at_connect', babase.Call(self._handle_impact))
+                ('call', 'at_connect', babase.CallPartial(self._handle_impact))
             ),
         )
         self.left_region_material = bs.Material()
@@ -107,14 +107,14 @@ class FlappyBirdGame(MeteorShowerGame):
             actions=(
                 ('modify_part_collision', 'collide', True),
                 ('modify_part_collision', 'physical', True),
-                ('call', 'at_connect', babase.Call(self._handle_impact_with_wall))
+                ('call', 'at_connect', babase.CallPartial(self._handle_impact_with_wall))
             ),
         )
 
         self.left_end_Region = bs.newnode('region', attrs={'position': (-18.75152479, 21.057427485, -5.52), 'scale': (
             2, 42, 6), 'type': 'box', 'materials': [self.left_region_material]})
         self.wtindex = 0
-        self.wttimer = bs.timer(5, babase.Call(self.wt_), repeat=True)
+        self.wttimer = bs.timer(5, babase.CallPartial(self.wt_), repeat=True)
         self.wthighlights = ["Created by Mr.Smoothy",
                              "hey smoothy youtube", "smoothy#multiverse"]
 

@@ -74,7 +74,7 @@ class modSetup(babase.Plugin):
                 logging.debug("Account V2 is active")
             else:
                 logging.warning("Account V2 login require ....stay tuned.")
-                bs.apptimer(3, babase.Call(logging.debug,
+                bs.apptimer(3, babase.CallPartial(logging.debug,
                                            "Starting Account V2 login process...."))
                 bs.apptimer(6, account.AccountUtil)
         else:

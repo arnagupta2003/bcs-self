@@ -62,7 +62,7 @@ class TeamVictoryScoreScreenActivity(MultiTeamScoreScreenActivity):
         for team in self.session.sessionteams:
             bs.timer(
                 i * 0.15 + 0.15,
-                bs.WeakCall(self._show_team_name, vval - i * height, team,
+                babase.WeakCallPartial(self._show_team_name, vval - i * height, team,
                             i * 0.2, shift_time - (i * 0.150 + 0.150)))
             bs.timer(i * 0.150 + 0.5, self._score_display_sound_small.play)
             scored = (team is self._winner)
@@ -71,13 +71,13 @@ class TeamVictoryScoreScreenActivity(MultiTeamScoreScreenActivity):
                 delay = 1.2
                 bs.timer(
                     i * 0.150 + 0.2,
-                    bs.WeakCall(self._show_team_old_score, vval - i * height,
+                    babase.WeakCallPartial(self._show_team_old_score, vval - i * height,
                                 team, shift_time - (i * 0.15 + 0.2)))
                 bs.timer(i * 0.15 + 1.5, self._score_display_sound.play)
 
             bs.timer(
                 i * 0.150 + delay,
-                bs.WeakCall(self._show_team_score, vval - i * height, team,
+                babase.WeakCallPartial(self._show_team_score, vval - i * height, team,
                             scored, i * 0.2 + 0.1,
                             shift_time - (i * 0.15 + delay)))
             i += 1

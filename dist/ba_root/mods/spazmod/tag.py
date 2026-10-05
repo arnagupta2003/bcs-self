@@ -48,7 +48,7 @@ def addhp(node, spaz):
                      position=(0, 1.75, 0), shad=1.4)
         else:
             spaz.hptimer = None
-    spaz.hptimer = bs.Timer(2, babase.Call(
+    spaz.hptimer = bs.Timer(2, babase.CallPartial(
         showHP), repeat=True)
 
 
@@ -164,5 +164,5 @@ class HitPoint(object):
             self._Text.delete()
             m.delete()
 
-        self.timer = bs.Timer(2, babase.Call(
+        self.timer = bs.Timer(2, babase.CallPartial(
             a))

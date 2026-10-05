@@ -295,7 +295,7 @@ class PotatoPlayerSpaz(PlayerSpaz):
             self.set_bombs_marked()
             # When the bomb physics node dies, call a function.
             bomb.node.add_death_action(
-                bs.WeakCall(self.bomb_died, bomb))
+                babase.WeakCallPartial(self.bomb_died, bomb))
 
     # Here's the function that gets called when one of the player's bombs dies.
     # We reference the player's dropped_bombs list and remove the bomb that died.
@@ -535,8 +535,8 @@ class Player(bs.Player['Team']):
 
             self.stunned_time_remaining = stun_time  # Set our stun time remaining
             # Remove our stun once the time is up
-            self.stunned_timer = bs.Timer(stun_time + 0.1, babase.Call(self.stun_remove))
-            self.stunned_update_timer = bs.Timer(0.1, babase.Call(
+            self.stunned_timer = bs.Timer(stun_time + 0.1, babase.CallPartial(self.stun_remove))
+            self.stunned_update_timer = bs.Timer(0.1, babase.CallPartial(
                 self.stunned_timer_tick), repeat=True)  # Call a function every 0.1 seconds
             self.fall_times += 1  # Increase the amount of times we fell by one
             # Change the text above the Spaz's head to total stun time
@@ -788,11 +788,11 @@ class HotPotato(bs.TeamGameActivity[Player, bs.Team]):
                 # Let's add our lone survivor to the match placement list.
                 self.match_placement.append(alive_players[0].team)
             # Wait a while to let this sink in before we announce our victor.
-            self._end_game_timer = bs.Timer(1.25, babase.Call(self.end_game))
+            self._end_game_timer = bs.Timer(1.25, babase.CallPartial(self.end_game))
         else:
             # There's still players remaining, so let's wait a while before marking a new player.
             self.new_mark_timer = bs.Timer(
-                2.0 if self.slow_motion else 4.0, babase.Call(self.new_mark))
+                2.0 if self.slow_motion else 4.0, babase.CallPartial(self.new_mark))
 
     # Another extensively used function that returns all alive players.
     def get_alive_players(self) -> Sequence[bs.Player]:
@@ -830,7 +830,7 @@ class HotPotato(bs.TeamGameActivity[Player, bs.Team]):
         # Set time until marked players explode
         self.elimination_timer_display = self.settings['Elimination Timer']
         # Set a timer that calls _eliminate_tick every second
-        self.marked_tick_timer = bs.Timer(1.0, babase.Call(self._eliminate_tick), repeat=True)
+        self.marked_tick_timer = bs.Timer(1.0, babase.CallPartial(self._eliminate_tick), repeat=True)
         # Mark all chosen victims and play a sound
         for new_victim in all_victims:
             # _marked_sounds is an array.
@@ -854,7 +854,7 @@ class HotPotato(bs.TeamGameActivity[Player, bs.Team]):
         else:
             # Pick random player(s) to get marked
             self.new_mark_timer = bs.Timer(
-                2.0 if self.slow_motion else 5.2, babase.Call(self.new_mark))
+                2.0 if self.slow_motion else 5.2, babase.CallPartial(self.new_mark))
 
         self._update_icons()  # Create player state icons
 
@@ -876,8 +876,7 @@ class HotPotato(bs.TeamGameActivity[Player, bs.Team]):
     def _show_tip(self) -> None:
 
         from bascenev1._gameutils import animate, GameTip
-        from babase._mgen.enums import SpecialChar
-        from babase._language import Lstr
+        from babase import Lstr, SpecialChar
 
         # If there's any tips left on the list, display one.
         if self.tips:

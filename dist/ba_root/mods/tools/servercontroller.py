@@ -25,7 +25,7 @@ def _access_check_response(self, data) -> None:
             flush=True)
         if data['accessible']:
             # _fetch_public_servers()
-            _babase.queue_chcker_timer = bs.AppTimer(8, babase.Call(
+            _babase.queue_chcker_timer = bs.AppTimer(8, babase.CallPartial(
                 simple_queue_checker), repeat=True)
             print(
                 f'{Clr.SBLU}Master server access check of{addrstr}'
@@ -60,7 +60,7 @@ def _fetch_public_servers():
             'proto': bui.app.protocol_version,
             'lang': bs.app.lang.language,
         },
-        callback=bui.WeakCall(_on_public_party_response),
+        callback=babase.WeakCallPartial(_on_public_party_response),
     )
     bui.app.plus.run_v1_account_transactions()
 
@@ -80,7 +80,7 @@ def _on_public_party_response(result):
     #  aah sad , public party result dont include our own server
     if queue_id:
         _babase.our_queue_id = queue_id
-        _babase.queue_chcker_timer = bs.timer(6, babase.Call(check_queue),
+        _babase.queue_chcker_timer = bs.timer(6, babase.CallPartial(check_queue),
                                               repeat=True)
     else:
         print("Something is wrong , why our server is not in public list.")
@@ -89,7 +89,7 @@ def _on_public_party_response(result):
 def check_queue():
     bui.app.plus.add_v1_account_transaction(
         {'type': 'PARTY_QUEUE_QUERY', 'q': _babase.our_queue_id},
-        callback=babase.Call(on_update_response),
+        callback=babase.CallPartial(on_update_response),
     )
     bui.app.plus.run_v1_account_transactions()
     # lets dont spam our own queue

@@ -223,8 +223,8 @@ class ShimlaGame(DeathMatchGame):
                 9: 5+12,
                 15: 5.1
             })
-            bs.timer(16, babase.Call(lambda lift: lift.update({'state': 'end'}), lift))
-            bs.timer(12, babase.Call(clean, lift))
+            bs.timer(16, babase.CallPartial(lambda lift: lift.update({'state': 'end'}), lift))
+            bs.timer(12, babase.CallPartial(clean, lift))
 
     def _handle_lift_disconnect(self):
         region = bs.getcollision().sourcenode

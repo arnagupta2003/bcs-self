@@ -297,18 +297,18 @@ def replay(player, stunt_name):
             if value is None:
                 bs.timer(
                     move["time"],
-                    babase.Call(player.actor.move_map[move["move"]["action"]])
+                    babase.CallPartial(player.actor.move_map[move["move"]["action"]])
                 )
             else:
                 bs.timer(
                     move["time"],
-                    babase.Call(player.actor.move_map[move["move"]["action"]],
+                    babase.CallPartial(player.actor.move_map[move["move"]["action"]],
                                 move["move"]["value"])
                 )
         last_move_time = move["time"]
         time_to_hide_controls = last_move_time + 1
         bs.timer(time_to_hide_controls,
-                 babase.Call(handle_player_replay_end, player))
+                 babase.CallPartial(handle_player_replay_end, player))
 
 
 def spawn_mirror_spaz(player):
@@ -348,18 +348,18 @@ def ghost(player, stunt_name):
             if value is None:
                 bs.timer(
                     move["time"],
-                    babase.Call(bot.move_map[move["move"]["action"]])
+                    babase.CallPartial(bot.move_map[move["move"]["action"]])
                 )
                 ui_activation = CONTROLS_UI_MAP.get(move["move"]["action"])
                 if ui_activation:
                     bs.timer(
                         move["time"],
-                        babase.Call(ui_activation, player.actor._activity())
+                        babase.CallPartial(ui_activation, player.actor._activity())
                     )
             else:
                 bs.timer(
                     move["time"],
-                    babase.Call(bot.move_map[move["move"]["action"]],
+                    babase.CallPartial(bot.move_map[move["move"]["action"]],
                                 move["move"]["value"])
                 )
                 ui_activation = CONTROLS_UI_MAP.get(move["move"]["action"])
@@ -367,14 +367,14 @@ def ghost(player, stunt_name):
                 if ui_activation:
                     bs.timer(
                         move["time"],
-                        babase.Call(ui_activation, player.actor._activity(),
+                        babase.CallPartial(ui_activation, player.actor._activity(),
                                     move["move"]["value"])
                     )
         last_move_time = move["time"]
         time_to_hide_controls = last_move_time + 1
         bs.timer(time_to_hide_controls,
-                 babase.Call(handle_player_replay_end, player))
-        bs.timer(time_to_hide_controls, babase.Call(bot.node.delete))
+                 babase.CallPartial(handle_player_replay_end, player))
+        bs.timer(time_to_hide_controls, babase.CallPartial(bot.node.delete))
 
 
 def give_ghost_power(spaz):

@@ -458,7 +458,7 @@ class LasorTracerGame(bs.TeamGameActivity[Player, Team]):
                                          enable_bomb=False,
                                          enable_pickup=False)
         if not self._solo_mode:
-            bs.timer(0.3, babase.Call(self._print_lives, player))
+            bs.timer(0.3, babase.CallPartial(self._print_lives, player))
 
         # If we have any icons, update their state.
         for icon in player.icons:
@@ -602,10 +602,10 @@ class LasorTracerGame(bs.TeamGameActivity[Player, Team]):
             })
 
     def create_laser(self) -> None:
-        bs.timer(6, babase.Call(self.LRlaser, True))
+        bs.timer(6, babase.CallPartial(self.LRlaser, True))
 
-        bs.timer(7, babase.Call(self.UDlaser, True))
-        bs.timer(30, babase.Call(self.create_laser))
+        bs.timer(7, babase.CallPartial(self.UDlaser, True))
+        bs.timer(30, babase.CallPartial(self.create_laser))
 
     def LRlaser(self, left):
         ud_1_r = bs.newnode('region', attrs={'position': (-5, 2.6, 0), 'scale': (
@@ -643,9 +643,9 @@ class LasorTracerGame(bs.TeamGameActivity[Player, Team]):
             20: x2
         })
         _rcombine.connectattr('output', ud_1_r, 'position')
-        bs.timer(20, babase.Call(ud_1_r.delete))
+        bs.timer(20, babase.CallPartial(ud_1_r.delete))
         t = random.randrange(7, 13)
-        bs.timer(t, babase.Call(self.LRlaser, random.randrange(0, 2)))
+        bs.timer(t, babase.CallPartial(self.LRlaser, random.randrange(0, 2)))
 
     def UDlaser(self, up):
         ud_2_r = bs.newnode('region', attrs={'position': (-3, 2.6, -6), 'scale': (
@@ -684,6 +684,6 @@ class LasorTracerGame(bs.TeamGameActivity[Player, Team]):
         })
         _rcombine.connectattr('output', ud_2_r, 'position')
 
-        bs.timer(17, babase.Call(ud_2_r.delete))
+        bs.timer(17, babase.CallPartial(ud_2_r.delete))
         t = random.randrange(6, 13)
-        bs.timer(t, babase.Call(self.UDlaser, random.randrange(0, 2)))
+        bs.timer(t, babase.CallPartial(self.UDlaser, random.randrange(0, 2)))

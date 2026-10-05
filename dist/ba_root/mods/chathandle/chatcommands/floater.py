@@ -196,7 +196,7 @@ class Floater(bs.Actor):
             self.node.velocity = (
             (px - pn[0]) / dist, (py - pn[1]) / dist, (pz - pn[2]) / dist)
             t = dist - 1 if dist - 1 >= 0 else 0.1
-            bs.timer(t, bs.WeakCall(self.move), suppress_format_warning=True)
+            bs.timer(t, babase.WeakCallPartial(self.move), suppress_format_warning=True)
 
     def handlemessage(self, msg):
         if isinstance(msg, bs.DieMessage):
@@ -251,6 +251,6 @@ def assignFloInputs(clientID: int):
                 i.assigninput(InputType.JUMP_PRESS, floater.down)
                 i.assigninput(InputType.BOMB_PRESS, floater.drop)
                 i.assigninput(InputType.PUNCH_PRESS,
-                              babase.Call(dis, i, floater))
+                              babase.CallPartial(dis, i, floater))
                 i.assigninput(InputType.UP_DOWN, floater.updown)
                 i.assigninput(InputType.LEFT_RIGHT, floater.leftright)

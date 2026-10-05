@@ -8,7 +8,7 @@ from discord.ext.commands import Bot
 
 import babase
 import bascenev1 as bs
-from babase._general import Call
+from babase import CallPartial
 
 logging.getLogger('asyncio').setLevel(logging.WARNING)
 intents = discord.Intents().all()
@@ -50,7 +50,7 @@ async def on_message(message):
     channel = message.channel
 
     if message.channel.id == logsChannelID:
-        _babase.pushcall(Call(bs.chatmessage,
+        _babase.pushcall(CallPartial(bs.chatmessage,
                               message.content), from_other_thread=True)
 
 
@@ -147,8 +147,8 @@ def get_chats():
 class BsDataThread(object):
     def __init__(self):
         self.refreshStats()
-        self.Timer = bs.AppTimer(8, babase.Call(self.refreshStats), repeat=True)
-        # self.Timerr = bs.Timer( 10,babase.Call(self.refreshLeaderboard),timetype = babase.TimeType.REAL,repeat = True)
+        self.Timer = bs.AppTimer(8, babase.CallPartial(self.refreshStats), repeat=True)
+        # self.Timerr = bs.Timer( 10,babase.CallPartial(self.refreshLeaderboard),timetype = babase.TimeType.REAL,repeat = True)
 
     # def refreshLeaderboard(self):
     #     global leaderboard

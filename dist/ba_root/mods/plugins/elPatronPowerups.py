@@ -3,19 +3,49 @@ from __future__ import annotations
 
 _sp_ = ('\n')
 
-import babase
-import bauiv1 as bui
+from typing import TYPE_CHECKING
 
-from bauiv1lib.profile import browser
+import babase
+
+try:
+    import bauiv1 as bui
+    from bauiv1lib.profile import browser
+    from bauiv1lib.popup import PopupWindow, PopupMenu
+    from bascenev1lib.mainmenu import MainMenuActivity, MainMenuSession
+    from bauiv1lib.confirm import ConfirmWindow
+except ImportError:
+    bui = None
+    UI_AVAILABLE = False
+
+    class _HeadlessWindow:
+        def __init__(self, *args, **kwargs):
+            raise RuntimeError('UI windows are unavailable on a headless server.')
+
+    class _HeadlessBrowser:
+        ProfileBrowserWindow = _HeadlessWindow
+
+    browser = _HeadlessBrowser()
+    PopupWindow = PopupMenu = ConfirmWindow = _HeadlessWindow
+    MainMenuActivity = MainMenuSession = _HeadlessWindow
+else:
+    UI_AVAILABLE = True
+
+
 from bascenev1lib.actor import bomb
 from bascenev1lib.actor import powerupbox as pupbox
 from bascenev1lib.actor.spazbot import SpazBot
-from bauiv1lib.popup import (PopupWindow, PopupMenu)
-from bascenev1lib.mainmenu import (MainMenuActivity, MainMenuSession)
 from bascenev1lib.actor.popuptext import PopupText
-from bauiv1lib.confirm import ConfirmWindow
 from bascenev1lib.actor.spaz import *
 from bascenev1lib.actor.bomb import BombFactory
+
+
+def _ui_available() -> bool:
+    if not UI_AVAILABLE:
+        return False
+    try:
+        return bui.app.ui_v1 is not None
+    except Exception:
+        return False
 
 
 if TYPE_CHECKING:
@@ -328,6 +358,9 @@ class BearStore:
     def buy(self):
         if not self.store:
             if self.coins >= (self.price):
+                if not _ui_available():
+                    return
+
                 def confirm():
                     STORE[self.value] = True
                     apg['Bear Coin'] -= int(self.price)
@@ -336,9 +369,16 @@ class BearStore:
                     apg.apply_and_commit()
                     self.callback()
 
-                ConfirmWindow(getlanguage('Confirm Purchase', subs=self.coins),
-                              width=400, height=120, action=confirm,
-                              ok_text=babase.Lstr(resource='okText'))
+                try:
+                    ConfirmWindow(
+                        getlanguage('Confirm Purchase', subs=self.coins),
+                        width=400,
+                        height=120,
+                        action=confirm,
+                        ok_text=babase.Lstr(resource='okText'),
+                    )
+                except (ImportError, RuntimeError, AttributeError):
+                    return
             else:
                 bs.broadcastmessage(getlanguage('Coins 0'), (1, 0, 0))
                 bs.getsound('error').play()
@@ -368,12 +408,12 @@ class PromoCode:
         if self.code != "":
             bs.broadcastmessage(
                 babase.Lstr(resource='submittingPromoCodeText'), (0, 1, 0))
-            bs.timer(2, babase.Call(self.validate_code))
+            bs.timer(2, babase.CallPartial(self.validate_code))
 
     def validate_code(self):
         if self.code in self.codes_store:
             if self.promo_code_expire:
-                bs.timer(1.5, babase.Call(self.successful_code))
+                bs.timer(1.5, babase.CallPartial(self.successful_code))
                 bs.broadcastmessage(getlanguage('True Code'), (0, 1, 0))
                 bs.getsound('cheer').play()
                 self.code_type[0] = False
@@ -503,6 +543,8 @@ class NewProfileBrowserWindow(browser.ProfileBrowserWindow):
                  in_main_menu: bool = True,
                  selected_profile: str = None,
                  origin_widget: bui.Widget = None):
+        if not _ui_available():
+            raise RuntimeError('Profile browser UI is unavailable.')
         super().__init__(transition, in_main_menu, selected_profile,
                          origin_widget)
 
@@ -519,7 +561,7 @@ class NewProfileBrowserWindow(browser.ProfileBrowserWindow):
                                            size=(size, size),
                                            button_type='square',
                                            label='',
-                                           on_activate_call=babase.Call(
+                                           on_activate_call=babase.CallPartial(
                                                self.powerupmanager_window))
 
             size = size * 0.60
@@ -540,8 +582,13 @@ class NewProfileBrowserWindow(browser.ProfileBrowserWindow):
                                        h_align='center', v_align='center')
 
     def powerupmanager_window(self):
+        if not _ui_available():
+            return
         bui.containerwidget(edit=self._root_widget, transition='out_left')
-        PowerupManagerWindow()
+        try:
+            PowerupManagerWindow()
+        except (ImportError, RuntimeError, AttributeError):
+            return
 
 
 class NewPowerupBoxFactory(pupbox.PowerupBoxFactory):
@@ -641,7 +688,7 @@ def _bomb_init(self,
         self.shield_fire = bs.newnode('shield', owner=self.node,
                                       attrs={'color': (6.5, 6.5, 2.0), 'radius': 0.6})
         self.node.connectattr('position', self.shield_fire, 'position')
-        self.fire_effect_time = bs.Timer(0.1, babase.Call(fire_effect, self), repeat=True)
+        self.fire_effect_time = bs.Timer(0.1, babase.CallPartial(fire_effect, self), repeat=True)
 
     elif self.bm_type == 'impairment':
         self.bomb_type = self.bm_type
@@ -836,7 +883,7 @@ def _pbx_(self, position: Sequence[float] = (0.0, 1.0, 0.0),
                   position=[0, 0.9, 0], colors_name=False)
 
         while (interval + 3):
-            bs.timer(time - 1, babase.Call(update_time, f'{time2}s'))
+            bs.timer(time - 1, babase.CallPartial(update_time, f'{time2}s'))
 
             if time2 == 0:
                 break
@@ -985,10 +1032,10 @@ def new_handlemessage(self, msg: Any) -> Any:
         self._num_times_hit += 1
 
     elif isinstance(msg, bs.ShouldShatterMessage):
-        bs.timer(0.001, babase.Call(self.shatter))
+        bs.timer(0.001, babase.CallPartial(self.shatter))
 
     elif isinstance(msg, bs.ImpactDamageMessage):
-        bs.timer(0.001, babase.Call(self._hit_self, msg.intensity))
+        bs.timer(0.001, babase.CallPartial(self._hit_self, msg.intensity))
 
     elif isinstance(msg, bs.PowerupMessage):
         factory = NewPowerupBoxFactory.get()
@@ -1009,10 +1056,10 @@ def new_handlemessage(self, msg: Any) -> Any:
                     t_ms + POWERUP_WEAR_OFF_TIME)
                 self._multi_bomb_wear_off_timer = (bs.Timer(
                     (POWERUP_WEAR_OFF_TIME - 2000),
-                    babase.Call(self._multi_bomb_wear_off_flash)))
+                    babase.CallPartial(self._multi_bomb_wear_off_flash)))
                 self._multi_bomb_wear_off_timer = (bs.Timer(
                     POWERUP_WEAR_OFF_TIME,
-                    babase.Call(self._multi_bomb_wear_off)))
+                    babase.CallPartial(self._multi_bomb_wear_off)))
         elif msg.poweruptype == 'land_mines':
             self.set_land_mine_count(min(self.land_mine_count + 3, 3))
         elif msg.poweruptype == 'impact_bombs':
@@ -1028,10 +1075,10 @@ def new_handlemessage(self, msg: Any) -> Any:
                     t_ms + POWERUP_WEAR_OFF_TIME)
                 self._bomb_wear_off_flash_timer = (bs.Timer(
                     POWERUP_WEAR_OFF_TIME - 2000,
-                    babase.Call(self._bomb_wear_off_flash)))
+                    babase.CallPartial(self._bomb_wear_off_flash)))
                 self._bomb_wear_off_timer = (bs.Timer(
                     POWERUP_WEAR_OFF_TIME,
-                    babase.Call(self._bomb_wear_off)))
+                    babase.CallPartial(self._bomb_wear_off)))
         elif msg.poweruptype == 'sticky_bombs':
             self.bomb_type = 'sticky'
             tex = self._get_bomb_type_tex()
@@ -1045,10 +1092,10 @@ def new_handlemessage(self, msg: Any) -> Any:
                     t_ms + POWERUP_WEAR_OFF_TIME)
                 self._bomb_wear_off_flash_timer = (bs.Timer(
                     POWERUP_WEAR_OFF_TIME - 2000,
-                    babase.Call(self._bomb_wear_off_flash)))
+                    babase.CallPartial(self._bomb_wear_off_flash)))
                 self._bomb_wear_off_timer = (bs.Timer(
                     POWERUP_WEAR_OFF_TIME,
-                    babase.Call(self._bomb_wear_off)))
+                    babase.CallPartial(self._bomb_wear_off)))
         elif msg.poweruptype == 'punch':
             self._has_boxing_gloves = True
             tex = PowerupBoxFactory.get().tex_punch
@@ -1064,10 +1111,10 @@ def new_handlemessage(self, msg: Any) -> Any:
                     t_ms + POWERUP_WEAR_OFF_TIME)
                 self._boxing_gloves_wear_off_flash_timer = (bs.Timer(
                     POWERUP_WEAR_OFF_TIME - 2000,
-                    bs.WeakCall(self._gloves_wear_off_flash)))
+                    babase.WeakCallPartial(self._gloves_wear_off_flash)))
                 self._boxing_gloves_wear_off_timer = (bs.Timer(
                     POWERUP_WEAR_OFF_TIME,
-                    bs.WeakCall(self._gloves_wear_off),))
+                    babase.WeakCallPartial(self._gloves_wear_off),))
         elif msg.poweruptype == 'shield':
             factory = SpazFactory.get()
             self.equip_shields(decay=factory.shield_decay_rate > 0)
@@ -1086,10 +1133,10 @@ def new_handlemessage(self, msg: Any) -> Any:
                     t_ms + POWERUP_WEAR_OFF_TIME)
                 self._bomb_wear_off_flash_timer = (bs.Timer(
                     POWERUP_WEAR_OFF_TIME - 2000,
-                    bs.WeakCall(self._bomb_wear_off_flash)))
+                    babase.WeakCallPartial(self._bomb_wear_off_flash)))
                 self._bomb_wear_off_timer = (bs.Timer(
                     POWERUP_WEAR_OFF_TIME,
-                    bs.WeakCall(self._bomb_wear_off)))
+                    babase.WeakCallPartial(self._bomb_wear_off)))
         elif msg.poweruptype == 'health':
             if self.edg_eff:
                 f = self.color[0]
@@ -1148,10 +1195,10 @@ def new_handlemessage(self, msg: Any) -> Any:
                     t_ms + POWERUP_WEAR_OFF_TIME)
                 self._bomb_wear_off_flash_timer = (bs.Timer(
                     POWERUP_WEAR_OFF_TIME - 2000,
-                    bs.WeakCall(self._bomb_wear_off_flash)))
+                    babase.WeakCallPartial(self._bomb_wear_off_flash)))
                 self._bomb_wear_off_timer = (bs.Timer(
                     POWERUP_WEAR_OFF_TIME,
-                    bs.WeakCall(self._bomb_wear_off)))
+                    babase.WeakCallPartial(self._bomb_wear_off)))
 
         elif msg.poweruptype == 'fire_bombs':
             self.bomb_type = 'fire'
@@ -1166,10 +1213,10 @@ def new_handlemessage(self, msg: Any) -> Any:
                     t_ms + POWERUP_WEAR_OFF_TIME)
                 self._bomb_wear_off_flash_timer = (bs.Timer(
                     POWERUP_WEAR_OFF_TIME - 2000,
-                    bs.WeakCall(self._bomb_wear_off_flash)))
+                    babase.WeakCallPartial(self._bomb_wear_off_flash)))
                 self._bomb_wear_off_timer = (bs.Timer(
                     POWERUP_WEAR_OFF_TIME,
-                    bs.WeakCall(self._bomb_wear_off)))
+                    babase.WeakCallPartial(self._bomb_wear_off)))
 
         elif msg.poweruptype == 'impairment_bombs':
             self.bomb_type = 'impairment'
@@ -1184,10 +1231,10 @@ def new_handlemessage(self, msg: Any) -> Any:
                     t_ms + POWERUP_WEAR_OFF_TIME)
                 self._bomb_wear_off_flash_timer = (bs.Timer(
                     POWERUP_WEAR_OFF_TIME - 2000,
-                    bs.WeakCall(self._bomb_wear_off_flash)))
+                    babase.WeakCallPartial(self._bomb_wear_off_flash)))
                 self._bomb_wear_off_timer = (bs.Timer(
                     POWERUP_WEAR_OFF_TIME,
-                    bs.WeakCall(self._bomb_wear_off)))
+                    babase.WeakCallPartial(self._bomb_wear_off)))
 
         elif msg.poweruptype == 'ice_man':
             tex = factory.tex_ice_man
@@ -1207,10 +1254,10 @@ def new_handlemessage(self, msg: Any) -> Any:
 
                 self.ice_man_flash_timer = (bs.Timer(
                     ice_man_time - 2000,
-                    babase.Call(_ice_man_off_flash, self)))
+                    babase.CallPartial(_ice_man_off_flash, self)))
 
                 self.ice_man_timer = (bs.Timer(ice_man_time,
-                                               babase.Call(_ice_man_wear_off,
+                                               babase.CallPartial(_ice_man_wear_off,
                                                            self)))
 
         elif msg.poweruptype == 'speed':
@@ -1227,10 +1274,10 @@ def new_handlemessage(self, msg: Any) -> Any:
 
                 self.speed_flash_timer = (bs.Timer(
                     speed_time - 2000,
-                    babase.Call(_speed_off_flash, self)))
+                    babase.CallPartial(_speed_off_flash, self)))
 
                 self.speed_timer = (bs.apptimer(speed_time,
-                                                babase.Call(_speed_wear_off,
+                                                babase.CallPartial(_speed_wear_off,
                                                             self)))
 
         self.bmb_color: list = []
@@ -1252,7 +1299,7 @@ def new_handlemessage(self, msg: Any) -> Any:
         if not self.frozen:
             self.frozen = True
             self.node.frozen = True
-            bs.timer(5.0, babase.Call(self.handlemessage,
+            bs.timer(5.0, babase.CallPartial(self.handlemessage,
                                       bs.ThawMessage()))
             if self.hitpoints <= 0:
                 self.shatter()
@@ -1303,7 +1350,7 @@ def new_handlemessage(self, msg: Any) -> Any:
                 bs.getsound('fuse01').play()
 
             if duration != time:
-                self._fire_time = bs.Timer(0.1, babase.Call(fire_effect),
+                self._fire_time = bs.Timer(0.1, babase.CallPartial(fire_effect),
                                            repeat=True)
             else:
                 self._fire_time = None
@@ -1328,8 +1375,8 @@ def new_handlemessage(self, msg: Any) -> Any:
             damage = 103
             if not self.shield:
                 for firex in range(duration):
-                    bs.timer(index, babase.Call(fire, index, damage))
-                    self._fire_time = bs.Timer(0.1, babase.Call(fire_effect),
+                    bs.timer(index, babase.CallPartial(fire, index, damage))
+                    self._fire_time = bs.Timer(0.1, babase.CallPartial(fire_effect),
                                                repeat=True)
                     index += 1
             else:
@@ -1543,7 +1590,7 @@ def new_handlemessage(self, msg: Any) -> Any:
             if self._cursed and damage > 0:
                 bs.timer(
                     0.05,
-                    babase.Call(self.curse_explode,
+                    babase.CallPartial(self.curse_explode,
                                 msg.get_source_player(bs.Player)))
 
             if self.frozen and (damage > 200 or self.hitpoints <= 0):
@@ -1589,7 +1636,7 @@ def new_handlemessage(self, msg: Any) -> Any:
             t = 0
             if self.kill_eff:
                 for bombs in range(3):
-                    bs.timer(t, babase.Call(drop_bomb))
+                    bs.timer(t, babase.CallPartial(drop_bomb))
                     t += 0.15
                 self.kill_eff = False
 
@@ -1685,6 +1732,8 @@ def new_handlemessage(self, msg: Any) -> Any:
 
 class PowerupManagerWindow(PopupWindow):
     def __init__(self, transition='in_right'):
+        if not _ui_available():
+            raise RuntimeError('Powerup manager UI is unavailable.')
         columns = 2
         self._width = width = 800
         self._height = height = 500
@@ -1748,7 +1797,7 @@ class PowerupManagerWindow(PopupWindow):
                                                 label=babase.Lstr(
                                                     resource='backText'),
                                                 button_type='back',
-                                                on_activate_call=babase.Call(
+                                                on_activate_call=babase.CallPartial(
                                                     self._back))
         bui.buttonwidget(edit=self._backButton, button_type='backSmall',
                          size=(60, 60),
@@ -1783,7 +1832,7 @@ class PowerupManagerWindow(PopupWindow):
                     position=position, size=(110, 110),
                     scale=1, label='', enable_sound=False,
                     button_type='square',
-                    on_activate_call=babase.Call(self._set_tab, tag,
+                    on_activate_call=babase.CallPartial(self._set_tab, tag,
                                                  sound=True))
 
                 self.text = bui.textwidget(parent=self._root_widget,
@@ -2018,7 +2067,7 @@ class PowerupManagerWindow(PopupWindow):
                                      size=(100, 100),
                                      scale=0.4, label=direc,
                                      button_type='square', text_scale=4,
-                                     on_activate_call=babase.Call(
+                                     on_activate_call=babase.CallPartial(
                                          self.apperance_powerups, power, direc))
                     dipos += 100
 
@@ -2058,7 +2107,7 @@ class PowerupManagerWindow(PopupWindow):
                               choices=choices, width=150,
                               choices_display=c_display,
                               current_choice=config['Powerup Style'],
-                              on_value_change_call=babase.Call(self._all_popup,
+                              on_value_change_call=babase.CallPartial(self._all_popup,
                                                                'Powerup Style'))
 
             text = getlanguage('Powerup Style')
@@ -2079,7 +2128,7 @@ class PowerupManagerWindow(PopupWindow):
                                  size=(100, 100),
                                  repeat=True, scale=0.4, label=direc,
                                  button_type='square', text_scale=4,
-                                 on_activate_call=babase.Call(
+                                 on_activate_call=babase.CallPartial(
                                      self._powerups_scale, direc))
                 dipos += 100
 
@@ -2105,7 +2154,7 @@ class PowerupManagerWindow(PopupWindow):
 
             self.check = bui.checkboxwidget(parent=c, position=(
             position[0] + 30, position[1] - 230), value=config['Powerup Name'],
-                                            on_value_change_call=babase.Call(
+                                            on_value_change_call=babase.CallPartial(
                                                 self._switches, 'Powerup Name'),
                                             maxwidth=self._scroll_width * 0.9,
                                             text=getlanguage('Powerup Name'),
@@ -2114,7 +2163,7 @@ class PowerupManagerWindow(PopupWindow):
             self.check = bui.checkboxwidget(parent=c, position=(
             position[0] + 30, position[1] - 230 * 1.3),
                                             value=config['Powerup With Shield'],
-                                            on_value_change_call=babase.Call(
+                                            on_value_change_call=babase.CallPartial(
                                                 self._switches,
                                                 'Powerup With Shield'),
                                             maxwidth=self._scroll_width * 0.9,
@@ -2126,7 +2175,7 @@ class PowerupManagerWindow(PopupWindow):
                 self.check = bui.checkboxwidget(parent=c, position=(
                 position[0] + 30, position[1] - 230 * 1.6),
                                                 value=config['Powerup Time'],
-                                                on_value_change_call=babase.Call(
+                                                on_value_change_call=babase.CallPartial(
                                                     self._switches,
                                                     'Powerup Time'),
                                                 maxwidth=self._scroll_width * 0.9,
@@ -2175,7 +2224,7 @@ class PowerupManagerWindow(PopupWindow):
                                      repeat=True,
                                      scale=0.6, label=self.charstr[3],
                                      button_type='square', text_scale=2,
-                                     on_activate_call=babase.Call(
+                                     on_activate_call=babase.CallPartial(
                                          self.tank_shield_percentage,
                                          'Decrement'))
 
@@ -2185,7 +2234,7 @@ class PowerupManagerWindow(PopupWindow):
                                      size=(100, 100),
                                      scale=0.6, label=self.charstr[2],
                                      button_type='square',
-                                     on_activate_call=babase.Call(
+                                     on_activate_call=babase.CallPartial(
                                          self.tank_shield_percentage,
                                          'Increment'))
 
@@ -2222,7 +2271,7 @@ class PowerupManagerWindow(PopupWindow):
                                      repeat=True,
                                      scale=0.6, label=self.charstr[3],
                                      button_type='square', text_scale=2,
-                                     on_activate_call=babase.Call(
+                                     on_activate_call=babase.CallPartial(
                                          self.health_damage_percentage,
                                          'Decrement'))
 
@@ -2232,7 +2281,7 @@ class PowerupManagerWindow(PopupWindow):
                                      size=(100, 100),
                                      scale=0.6, label=self.charstr[2],
                                      button_type='square',
-                                     on_activate_call=babase.Call(
+                                     on_activate_call=babase.CallPartial(
                                          self.health_damage_percentage,
                                          'Increment'))
 
@@ -2392,7 +2441,7 @@ class PowerupManagerWindow(PopupWindow):
                                      text_scale=txt_scale, icon=icon,
                                      color=color,
                                      iconscale=1.7,
-                                     on_activate_call=babase.Call(
+                                     on_activate_call=babase.CallPartial(
                                          self._buy_object, store, p))
 
                 s = 180
@@ -2400,7 +2449,7 @@ class PowerupManagerWindow(PopupWindow):
                 position[0] + 210 - n_pos, position[1] + 55),
                                      size=(s, s + 30), scale=1, label='',
                                      color=color, button_type='square',
-                                     on_activate_call=babase.Call(
+                                     on_activate_call=babase.CallPartial(
                                          self._buy_object, store, p))
 
                 s -= 80
@@ -2630,7 +2679,7 @@ class PowerupManagerWindow(PopupWindow):
 
     def _buy_object(self, tag: str, price: int):
         store = BearStore(value=tag, price=price,
-                          callback=babase.Call(self.store_refresh, tag))
+                          callback=babase.CallPartial(self.store_refresh, tag))
         store.buy()
 
     def _promocode(self):
@@ -2647,8 +2696,13 @@ class PowerupManagerWindow(PopupWindow):
         self._set_tab('Percentage')
 
     def _back(self):
+        if not _ui_available():
+            return
         bui.containerwidget(edit=self._root_widget, transition='out_left')
-        browser.ProfileBrowserWindow()
+        try:
+            browser.ProfileBrowserWindow()
+        except (ImportError, RuntimeError, AttributeError):
+            return
 
 
 def enable():
@@ -2663,4 +2717,5 @@ def enable():
     Spaz._get_bomb_type_tex = new_get_bomb_type_tex
     Spaz.on_punch_press = spaz_on_punch_press
     Spaz.on_punch_release = spaz_on_punch_release
-    MainMenuActivity.on_transition_in = new_on_transition_in
+    if _ui_available():
+        MainMenuActivity.on_transition_in = new_on_transition_in

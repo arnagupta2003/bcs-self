@@ -176,7 +176,7 @@ class BridgitParallelo(bs.Map):
         #     conditions=('they_have_material',shared.player_material),
         #     actions=(
         #         ('modify_part_collision', 'collide', True),
-        #         ( 'call','at_connect',babase.Call(self._handle_player_pad_collide,real )),
+        #         ( 'call','at_connect',babase.CallPartial(self._handle_player_pad_collide,real )),
         #     ),
         #     )
         pos = (0.0, 3.004164695739746, -3.3991328477859497)

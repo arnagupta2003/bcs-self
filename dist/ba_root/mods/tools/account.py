@@ -22,7 +22,7 @@ class AccountUtil:
         plus.sign_out_v1()
         babase.app.cloud.send_message_cb(
             bacommon.cloud.LoginProxyRequestMessage(),
-            on_response=babase.Call(self._on_proxy_request_response))
+            on_response=babase.CallPartial(self._on_proxy_request_response))
 
     def _on_proxy_request_response(self,
                                    response: bacommon.cloud.LoginProxyRequestResponse | Exception) -> None:
@@ -38,7 +38,7 @@ class AccountUtil:
         self._proxyid = response.proxyid
         self._proxykey = response.proxykey
         bs.timer(STATUS_CHECK_INTERVAL_SECONDS,
-                 babase.Call(self._ask_for_status))
+                 babase.CallPartial(self._ask_for_status))
 
     def _ask_for_status(self) -> None:
         assert self._proxyid is not None
@@ -46,7 +46,7 @@ class AccountUtil:
         babase.app.cloud.send_message_cb(
             bacommon.cloud.LoginProxyStateQueryMessage(
                 proxyid=self._proxyid, proxykey=self._proxykey),
-            on_response=babase.Call(self._got_status))
+            on_response=babase.CallPartial(self._got_status))
 
     def _got_status(
         self, response: bacommon.cloud.LoginProxyStateQueryResponse | Exception
@@ -74,7 +74,7 @@ class AccountUtil:
         if (isinstance(response, Exception)
             or response.state is response.State.WAITING):
             bs.timer(STATUS_CHECK_INTERVAL_SECONDS,
-                     babase.Call(self._ask_for_status))
+                     babase.CallPartial(self._ask_for_status))
 
     def _logged_in(self):
         plus = bui.app.plus

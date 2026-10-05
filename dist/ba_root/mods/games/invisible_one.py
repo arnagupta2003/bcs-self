@@ -162,7 +162,7 @@ class InvicibleOneGame(bs.TeamGameActivity[Player, Team]):
                 ('modify_part_collision', 'collide', True),
                 ('modify_part_collision', 'physical', False),
                 ('call', 'at_connect',
-                 bs.WeakCall(self._handle_reset_collide)),
+                 babase.WeakCallPartial(self._handle_reset_collide)),
             ),
         )
 

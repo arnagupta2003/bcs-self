@@ -64,7 +64,7 @@ class NewPlayerSpaz(PlayerSpaz):
         self.check_avalible_bombs()
         self._bomb_check_timer = bs.timer(
             0.5,
-            bs.WeakCall(self.check_avalible_bombs),
+            babase.WeakCallPartial(self.check_avalible_bombs),
             repeat=True)
 
     def drop_bomb(self) -> stdbomb.Bomb | None:
@@ -95,7 +95,7 @@ class NewPlayerSpaz(PlayerSpaz):
 
         self.bomb_count -= 1
         bomb.node.add_death_action(
-            bs.WeakCall(self.handlemessage, BombDiedMessage())
+            babase.WeakCallPartial(self.handlemessage, BombDiedMessage())
         )
         self._pick_up(bomb.node)
 
@@ -236,7 +236,7 @@ class BombOnMyHeadGame(bs.TeamGameActivity[Player, Team]):
         animate(light, 'intensity', {0: 0, 0.25: 1, 0.5: 0})
         bs.timer(0.5, light.delete)
 
-        bs.timer(1.0, bs.WeakCall(spaz.start_bomb_checking))
+        bs.timer(1.0, babase.WeakCallPartial(spaz.start_bomb_checking))
         spaz.set_bomb_count(self._max_bomb_limit)
 
     def handlemessage(self, msg: Any) -> Any:

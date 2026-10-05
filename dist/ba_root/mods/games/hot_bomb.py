@@ -13,6 +13,7 @@ import _babase
 import _bascenev1 as _bs
 from typing import TYPE_CHECKING
 
+import babase
 import bascenev1 as bs
 from bascenev1._messages import StandMessage
 from bascenev1lib.actor.bomb import Bomb
@@ -98,9 +99,9 @@ class Ball(bs.Actor):
         self.node.connectattr('position', self.light, 'position')
         self.animate_light = None
 
-        self._particles = bs.Timer(0.1, call=bs.WeakCall(self.particles),
+        self._particles = bs.Timer(0.1, call=babase.WeakCallPartial(self.particles),
                                    repeat=True)
-        self._sound_effect = bs.Timer(4, call=bs.WeakCall(self.sound_effect),
+        self._sound_effect = bs.Timer(4, call=babase.WeakCallPartial(self.sound_effect),
                                       repeat=True)
 
         self.d_time = d_time
@@ -112,7 +113,7 @@ class Ball(bs.Actor):
         if self._timer is not None:
             self._count = self._timer
             self._tick_timer = bs.Timer(1.0,
-                                        call=bs.WeakCall(self._tick),
+                                        call=babase.WeakCallPartial(self._tick),
                                         repeat=True)
             m = bs.newnode('math', owner=self.node, attrs={
                 'input1': (0, 0.6, 0), 'operation': 'add'})
@@ -417,7 +418,7 @@ class NewPlayerSpaz(PlayerSpaz):
         if dropping_bomb:
             self.bomb_count -= 1
             bomb.node.add_death_action(
-                bs.WeakCall(self.handlemessage, BombDiedMessage()))
+                babase.WeakCallPartial(self.handlemessage, BombDiedMessage()))
         self._pick_up(bomb.node)
 
         try:
@@ -1027,7 +1028,7 @@ class HotBombGame(bs.TeamGameActivity[Player, Team]):
         self._ball._counter.text = str(self._bomb_timer)
         self._ball._tick_timer = bs.Timer(
             1.0,
-            call=bs.WeakCall(self._ball._tick),
+            call=babase.WeakCallPartial(self._ball._tick),
             repeat=True
         )
         self._ball._animate = bs.animate(
@@ -1197,7 +1198,7 @@ class HotBombGame(bs.TeamGameActivity[Player, Team]):
     def respawn_player(self,
                        player: PlayerType,
                        respawn_time: Optional[float] = None) -> None:
-        from babase._general import WeakCall
+        from babase import WeakCallPartial
 
         assert player
         if respawn_time is None:
@@ -1214,7 +1215,7 @@ class HotBombGame(bs.TeamGameActivity[Player, Team]):
         if player.actor and not self.has_ended():
             from bascenev1lib.actor.respawnicon import RespawnIcon
             player.customdata['respawn_timer'] = _bs.Timer(
-                respawn_time, WeakCall(self.spawn_player_if_exists, player))
+                respawn_time, WeakCallPartial(self.spawn_player_if_exists, player))
             player.customdata['respawn_icon'] = RespawnIcon(
                 player, respawn_time)
 
@@ -1370,7 +1371,7 @@ class NewBomb(bs.Actor):
                 bs.timer(5, scorch.delete)
 
             bs.timer(0.05, self.explode_region.delete)
-            bs.timer(0.001, bs.WeakCall(self.handlemessage, bs.DieMessage()))
+            bs.timer(0.001, babase.WeakCallPartial(self.handlemessage, bs.DieMessage()))
 
     def _touch_player(self):
         node = bs.getcollision().opposingnode

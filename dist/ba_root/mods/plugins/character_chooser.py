@@ -35,8 +35,8 @@ import _babase
 from typing import TYPE_CHECKING
 
 import babase
-import bauiv1 as bui
-from babase._language import Lstr
+from babase import Lstr
+import bascenev1 as bs
 
 if TYPE_CHECKING:
     from typing import Any, List, Dict, Union, Sequence, Optional
@@ -145,7 +145,7 @@ def __init__(self, vpos: float, sessionplayer: bs.SessionPlayer,
 
 def _set_ready(self, ready: bool) -> None:
     # pylint: disable=cyclic-import
-    from babase._general import Call
+    from babase import CallPartial
     profilename = self._profilenames[self._profileindex]
 
     # Handle '_edit' as a special case safely
@@ -162,23 +162,23 @@ def _set_ready(self, ready: bool) -> None:
     if not ready:
         self._sessionplayer.assigninput(
             babase.InputType.LEFT_PRESS,
-            Call(self.handlemessage, ChangeMessage('team', -1)))
+            CallPartial(self.handlemessage, ChangeMessage('team', -1)))
         self._sessionplayer.assigninput(
             babase.InputType.RIGHT_PRESS,
-            Call(self.handlemessage, ChangeMessage('team', 1)))
+            CallPartial(self.handlemessage, ChangeMessage('team', 1)))
         self._sessionplayer.assigninput(
             babase.InputType.BOMB_PRESS,
-            Call(self.handlemessage, ChangeMessage('character', 1)))
+            CallPartial(self.handlemessage, ChangeMessage('character', 1)))
         self._sessionplayer.assigninput(
             babase.InputType.UP_PRESS,
-            Call(self.handlemessage, ChangeMessage('profileindex', -1)))
+            CallPartial(self.handlemessage, ChangeMessage('profileindex', -1)))
         self._sessionplayer.assigninput(
             babase.InputType.DOWN_PRESS,
-            Call(self.handlemessage, ChangeMessage('profileindex', 1)))
+            CallPartial(self.handlemessage, ChangeMessage('profileindex', 1)))
         self._sessionplayer.assigninput(
             (babase.InputType.JUMP_PRESS, babase.InputType.PICK_UP_PRESS,
              babase.InputType.PUNCH_PRESS),
-            Call(self.handlemessage, ChangeMessage('ready', 1)))
+            CallPartial(self.handlemessage, ChangeMessage('ready', 1)))
         self._ready = False
         self._update_text()
         self._sessionplayer.setname('untitled', real=False)
@@ -191,18 +191,18 @@ def _set_ready(self, ready: bool) -> None:
              babase.InputType.PICK_UP_PRESS), self._do_nothing)
         self._sessionplayer.assigninput(
             (babase.InputType.UP_PRESS),
-            Call(self.handlemessage, ChangeMessage('characterchooser', -1)))
+            CallPartial(self.handlemessage, ChangeMessage('characterchooser', -1)))
         self._sessionplayer.assigninput(
             (babase.InputType.DOWN_PRESS),
-            Call(self.handlemessage, ChangeMessage('characterchooser', 1)))
+            CallPartial(self.handlemessage, ChangeMessage('characterchooser', 1)))
         self._sessionplayer.assigninput(
             (babase.InputType.BOMB_PRESS),
-            Call(self.handlemessage, ChangeMessage('ready', 0)))
+            CallPartial(self.handlemessage, ChangeMessage('ready', 0)))
 
         self._sessionplayer.assigninput(
             (babase.InputType.JUMP_PRESS, babase.InputType.PICK_UP_PRESS,
              babase.InputType.PUNCH_PRESS),
-            Call(self.handlemessage, ChangeMessage('ready', 2)))
+            CallPartial(self.handlemessage, ChangeMessage('ready', 2)))
 
         # Store the last profile picked by this input for reuse.
         input_device = self._sessionplayer.inputdevice
@@ -271,7 +271,7 @@ def handlemessage(self, msg: Any) -> Any:
 
                 # This should be pretty hard to hit now with
                 # automatic local accounts.
-                bui.getsound('error').play()
+                bs.getsound('error').play()
             else:
 
                 # Pick the next player profile and assign our name

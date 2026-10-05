@@ -124,7 +124,7 @@ class DemolitionWar(EliminationGame):
         node = bs.getcollision().sourcenode
         bs.emitfx((node.position[0], 0.9, node.position[2]),
                   (0, 2, 0), 30, 1, spread=1, chunk_type='splinter')
-        bs.timer(0.1, babase.Call(node.delete))
+        bs.timer(0.1, babase.CallPartial(node.delete))
 
     def map_extend(self):
         # TODO need to improve here , so we can increase size of map easily with settings
@@ -137,7 +137,7 @@ class DemolitionWar(EliminationGame):
             actions=(
                 ('modify_part_collision', 'collide', True),
                 ('modify_part_collision', 'physical', True),
-                ('call', 'at_connect', babase.Call(self.on_blast))
+                ('call', 'at_connect', babase.CallPartial(self.on_blast))
             ))
         self.ramps = []
         for i in p:

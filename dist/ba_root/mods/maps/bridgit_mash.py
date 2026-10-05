@@ -176,7 +176,7 @@ class BridgitMash(bs.Map):
         #     conditions=('they_have_material',shared.player_material),
         #     actions=(
         #         ('modify_part_collision', 'collide', True),
-        #         ( 'call','at_connect',babase.Call(self._handle_player_pad_collide,real )),
+        #         ( 'call','at_connect',babase.CallPartial(self._handle_player_pad_collide,real )),
         #     ),
         #     )
         pos = (-5.3 + loc, 0.7, 1.1+z_marg)

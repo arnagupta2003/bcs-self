@@ -15,6 +15,7 @@ import random
 
 from typing import TYPE_CHECKING
 
+import babase
 import bascenev1
 import bascenev1 as bs
 from bascenev1lib.actor.flag import Flag, FlagPickedUpMessage
@@ -161,13 +162,13 @@ class MFGame(bs.TeamGameActivity[Player, Team]):
                     try:
                         player.survived = False
                         player.actor.handlemessage(bs.StandMessage((0, 3, -2)))
-                        bs.timer(0.5, bs.Call(player.actor.handlemessage,
+                        bs.timer(0.5, babase.CallPartial(player.actor.handlemessage,
                                               bs.FreezeMessage()))
-                        bs.timer(1.5, bs.Call(player.actor.handlemessage,
+                        bs.timer(1.5, babase.CallPartial(player.actor.handlemessage,
                                               bs.FreezeMessage()))
-                        bs.timer(2.5, bs.Call(player.actor.handlemessage,
+                        bs.timer(2.5, babase.CallPartial(player.actor.handlemessage,
                                               bs.FreezeMessage()))
-                        bs.timer(3, bs.Call(player.actor.handlemessage,
+                        bs.timer(3, babase.CallPartial(player.actor.handlemessage,
                                             bs.ShouldShatterMessage()))
                     except:
                         pass
@@ -258,7 +259,7 @@ class MFGame(bs.TeamGameActivity[Player, Team]):
         if isinstance(msg, bs.PlayerDiedMessage):
             super().handlemessage(msg)
             player = msg.getplayer(Player)
-            bs.timer(0.1, bs.Call(self.check_respawn, player))
+            bs.timer(0.1, babase.CallPartial(self.check_respawn, player))
             bs.timer(0.5, self.checkEnd)
         elif isinstance(msg, FlagPickedUpMessage):
             self.numPickedUp += 1
@@ -283,9 +284,9 @@ class MFGame(bs.TeamGameActivity[Player, Team]):
                             bs.broadcastmessage("No Flag? " + player.getname())
                             player.actor.handlemessage(
                                 bs.StandMessage((0, 3, -2)))
-                            bs.timer(0.5, bs.Call(player.actor.handlemessage,
+                            bs.timer(0.5, babase.CallPartial(player.actor.handlemessage,
                                                   bs.FreezeMessage()))
-                            bs.timer(3, bs.Call(player.actor.handlemessage,
+                            bs.timer(3, babase.CallPartial(player.actor.handlemessage,
                                                 bs.ShouldShatterMessage()))
                         except:
                             pass

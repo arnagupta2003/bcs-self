@@ -17,7 +17,7 @@ from serverdata import serverdata
 
 import babase
 import bascenev1 as bs
-from babase._general import Call
+from babase import CallPartial
 from tools import logger
 from repository import profiles
 blacklist = pdata.get_blacklist()
@@ -30,7 +30,7 @@ class checkserver(object):
     def start(self):
         self.players = []
 
-        self.t1 = bs.AppTimer(1, babase.Call(self.check),
+        self.t1 = bs.AppTimer(1, babase.CallPartial(self.check),
                               repeat=True)
 
     def check(self):
@@ -341,7 +341,7 @@ class LoadProfile(threading.Thread):
     def run(self):
         player_data = pdata.get_info(self.pbid)
         _babase.pushcall(
-            Call(on_player_join_server, self.pbid, player_data, self.ip,
+            CallPartial(on_player_join_server, self.pbid, player_data, self.ip,
                  self.device_id),
             from_other_thread=True)
 
@@ -366,7 +366,7 @@ def my_acc_age(pb_id):
 
 
 def save_age(age, pb_id, display_string):
-    _babase.pushcall(Call(pdata.add_profile, pb_id, display_string,
+    _babase.pushcall(CallPartial(pdata.add_profile, pb_id, display_string,
                           display_string, age), from_other_thread=True)
     time.sleep(2)
     thread2 = FetchThread(
@@ -379,7 +379,7 @@ def save_age(age, pb_id, display_string):
     if get_account_age(age) < settings["minAgeToJoinInHours"]:
         msg = "New Accounts not allowed to play here , come back tmrw."
         logger.log(pb_id + "|| kicked > new account")
-        _babase.pushcall(Call(kick_by_pb_id, pb_id, msg),
+        _babase.pushcall(CallPartial(kick_by_pb_id, pb_id, msg),
                          from_other_thread=True)
 
 
@@ -388,7 +388,7 @@ def save_ids(ids, pb_id, display_string):
 
     if display_string not in ids:
         msg = "Spoofed Id detected , Goodbye"
-        _babase.pushcall(Call(kick_by_pb_id, pb_id, msg),
+        _babase.pushcall(CallPartial(kick_by_pb_id, pb_id, msg),
                          from_other_thread=True)
         serverdata.clients[pb_id]["verified"] = False
         logger.log(
@@ -460,10 +460,10 @@ def account_check(account_id, ip, client_id):
                 data = urllib.request.urlopen(
                     f"https://mods.69420555.xyz/verifyownerip?ip={ip}&tag={account_id}")
             except:
-                _babase.pushcall(Call(bs.chatmessage,
+                _babase.pushcall(CallPartial(bs.chatmessage,
                                       "Click stats button and login your V2 account, to verify your identity", [client_id]), from_other_thread=True)
                 _babase.pushcall(
-                    Call(bs.disconnect_client, client_id, 2), from_other_thread=True)
+                    CallPartial(bs.disconnect_client, client_id, 2), from_other_thread=True)
                 return
             profiles.upsert_ip(account_id, ip)
 
@@ -475,9 +475,9 @@ def account_check(account_id, ip, client_id):
                     data = urllib.request.urlopen(
                         f"https://mods.69420555.xyz/verifyownerip?ip={ip}&tag={account_id}")
                 except:
-                    _babase.pushcall(Call(bs.chatmessage,
+                    _babase.pushcall(CallPartial(bs.chatmessage,
                                           "Click stats button and login your V2 account, to verify your identity", [client_id]), from_other_thread=True)
                     _babase.pushcall(
-                        Call(bs.disconnect_client, client_id, 2), from_other_thread=True)
+                        CallPartial(bs.disconnect_client, client_id, 2), from_other_thread=True)
                     return
                 profiles.upsert_ip(account_id, ip)

@@ -119,7 +119,7 @@ class FireChainGame(DeathMatchGame):
                               bs.MusicType.TO_THE_DEATH)
 
         self.wtindex = 0
-        self.wttimer = bs.timer(5, babase.Call(self.wt_), repeat=True)
+        self.wttimer = bs.timer(5, babase.CallPartial(self.wt_), repeat=True)
         self.wthighlights = ["Created by Mr.Smoothy",
                              "hey smoothy youtube", "smoothy#multiverse"]
 

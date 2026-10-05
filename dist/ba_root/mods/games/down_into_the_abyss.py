@@ -265,11 +265,11 @@ class Foothold(bs.Actor):
                     self.lrSig *= -1
                 self.node.velocity = (
                     self.lrSig * speed * self.lrSpeedPlus, speed, 0)
-                bs.timer(0.1, bs.WeakCall(self.keep_vel))
+                bs.timer(0.1, babase.WeakCallPartial(self.keep_vel))
             else:
                 self.node.velocity = (0, speed, 0)
                 # self.node.extraacceleration = (0, self.speed, 0)
-                bs.timer(0.1, bs.WeakCall(self.keep_vel))
+                bs.timer(0.1, babase.WeakCallPartial(self.keep_vel))
 
     def tnt_explode(self) -> None:
         pos = self.node.position
@@ -345,7 +345,7 @@ class AbyssPlayerSpaz(PlayerSpaz):
         self.node.hockey = True
         self.hitpoints_max = self.hitpoints = 1500  # more HP to handle drop
         bs.timer(bs.getactivity().peace_time,
-                 bs.WeakCall(self.safe_connect_controls_to_player))
+                 babase.WeakCallPartial(self.safe_connect_controls_to_player))
 
     def safe_connect_controls_to_player(self) -> None:
         try:
@@ -383,7 +383,7 @@ class AbyssPlayerSpaz(PlayerSpaz):
 
     def fix_2D_position(self) -> None:
         self.node.fly = True
-        bs.timer(0.02, bs.WeakCall(self.disable_fly))
+        bs.timer(0.02, babase.WeakCallPartial(self.disable_fly))
 
     def disable_fly(self) -> None:
         if self.node:
@@ -414,7 +414,7 @@ class AbyssPlayerSpaz(PlayerSpaz):
                 tval = bs.time()
                 assert isinstance(tval, (float, int))
                 self.node.curse_death_time = bs.time() + 15
-                bs.timer(15, bs.WeakCall(self.curse_explode))
+                bs.timer(15, babase.WeakCallPartial(self.curse_explode))
 
     def handlemessage(self, msg: Any) -> Any:
         dontUp = False
@@ -601,13 +601,13 @@ class AbyssGame(bs.TeamGameActivity[Player, Team]):
                 power='shield', breakable=False).autoretain()
 
         bs.timer(int(5.0 / self.cur_speed),
-                 bs.WeakCall(self.add_foothold), repeat=True)
+                 babase.WeakCallPartial(self.add_foothold), repeat=True)
 
         # Repeat check game end
         bs.timer(1.0, self._check_end_game, repeat=True)
         bs.timer(self.peace_time + 0.1,
-                 bs.WeakCall(self.tip_hint, hint_use_punch))
-        bs.timer(6.0, bs.WeakCall(self.faster_speed), repeat=True)
+                 babase.WeakCallPartial(self.tip_hint, hint_use_punch))
+        bs.timer(6.0, babase.WeakCallPartial(self.faster_speed), repeat=True)
 
     def tip_hint(self, text: str) -> None:
         bs.broadcastmessage(text, color=(0.2, 0.2, 1))

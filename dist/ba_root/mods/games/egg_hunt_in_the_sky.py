@@ -13,6 +13,7 @@ from __future__ import annotations
 import random
 from typing import TYPE_CHECKING
 
+import babase
 import bascenev1 as bs
 
 from bascenev1lib.actor.bomb import Bomb
@@ -205,7 +206,7 @@ class EggHuntInTheSkyGame(bs.TeamGameActivity[Player, Team]):
             assert self.initialplayerinfos is not None
             respawn_time = 2.0 + len(self.initialplayerinfos) * 1.0
             player.respawn_timer = bs.Timer(
-                respawn_time, bs.Call(self.spawn_player_if_exists, player)
+                respawn_time, babase.CallPartial(self.spawn_player_if_exists, player)
             )
             player.respawn_icon = RespawnIcon(player, respawn_time)
         else:

@@ -223,12 +223,12 @@ class CollectorGame(bs.TeamGameActivity[Player, Team]):
                 (
                     'call',
                     'at_connect',
-                    babase.Call(self._handle_player_flag_region_collide, True),
+                    babase.CallPartial(self._handle_player_flag_region_collide, True),
                 ),
                 (
                     'call',
                     'at_disconnect',
-                    babase.Call(self._handle_player_flag_region_collide, False),
+                    babase.CallPartial(self._handle_player_flag_region_collide, False),
                 ),
             ),
         )

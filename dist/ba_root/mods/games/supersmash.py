@@ -315,7 +315,7 @@ class SSPlayerSpaz(PlayerSpaz):
                 if self._cursed and damage > 0:
                     bs.timer(
                         0.05,
-                        bs.WeakCall(self.curse_explode,
+                        babase.WeakCallPartial(self.curse_explode,
                                     msg.get_source_player(bs.Player)))
 
                 # If we're frozen, shatter.. otherwise die if we hit zero
@@ -464,7 +464,7 @@ class SuperSmash(bs.TeamGameActivity[Player, Team]):
         self.setup_standard_powerup_drops(enable_tnt=False)
         self._pow = None
         self._tnt_drop_timer = bs.timer(1.0 * 0.30,
-                                        bs.WeakCall(self._drop_pow_box),
+                                        babase.WeakCallPartial(self._drop_pow_box),
                                         repeat=True)
 
         # Base kills needed to win on the size of the largest team.
@@ -711,7 +711,7 @@ class SuperSmashElimination(bs.TeamGameActivity[Player2, Team2]):
         self.setup_standard_powerup_drops(enable_tnt=False)
         self._pow = None
         self._tnt_drop_timer = bs.timer(1.0 * 0.30,
-                                        bs.WeakCall(self._drop_pow_box),
+                                        babase.WeakCallPartial(self._drop_pow_box),
                                         repeat=True)
         self._update_icons()
         bs.timer(1.0, self.check_end_game, repeat=True)

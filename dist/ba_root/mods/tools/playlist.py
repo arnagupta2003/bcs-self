@@ -11,7 +11,7 @@ from bascenev1 import filter_playlist
 import babase
 import bascenev1 as bs
 import bauiv1 as bui
-from babase._general import Call
+from babase import CallPartial
 from bascenev1._coopsession import CoopSession
 from bascenev1._dualteamsession import DualTeamSession
 # session change by smoothy
@@ -55,7 +55,7 @@ def set_playlist_inline(playlist, newPLaylistType):
 def withDelay(session, playlist):
     time.sleep(1)
 
-    _babase.pushcall(Call(updateSession, session, playlist),
+    _babase.pushcall(CallPartial(updateSession, session, playlist),
                      from_other_thread=True)
 
 

@@ -801,7 +801,7 @@ class SquidRaceGame(bs.TeamGameActivity[Player, Team]):
         pos = (pos[0] + random.uniform(*x_range), pos[1] + 1.0,
                pos[2] + random.uniform(*z_range))
         bs.timer(random.uniform(0.0, 2.0),
-                 bs.WeakCall(self._spawn_bomb_at_pos, pos))
+                 babase.WeakCallPartial(self._spawn_bomb_at_pos, pos))
 
     def _spawn_bomb_at_pos(self, pos: Sequence[float]) -> None:
         if self.has_ended():
@@ -839,7 +839,7 @@ class SquidRaceGame(bs.TeamGameActivity[Player, Team]):
         assert rmine is not None
         if not rmine.mine:
             self._flash_mine(m_index)
-            bs.timer(0.95, babase.Call(self._make_mine, m_index))
+            bs.timer(0.95, babase.CallPartial(self._make_mine, m_index))
 
     def spawn_player(self, player: Player) -> bs.Actor:
         if player.team.finished:

@@ -146,8 +146,8 @@ class QuakeBall(bs.Actor):
             'volume_intensity_scale': 15.0})
 
         self.node.connectattr('position', self.light_node, 'position')
-        self.emit_time = bs.Timer(0.015, bs.WeakCall(self.emit), repeat=True)
-        self.life_time = bs.Timer(5.0, bs.WeakCall(self.handlemessage,
+        self.emit_time = bs.Timer(0.015, babase.WeakCallPartial(self.emit), repeat=True)
+        self.life_time = bs.Timer(5.0, babase.WeakCallPartial(self.handlemessage,
                                                    bs.DieMessage()))
 
     def emit(self):
@@ -374,7 +374,7 @@ class QuakeGame(bs.TeamGameActivity[Player, Team]):
         self.setup_standard_time_limit(self._time_limit)
 
         self.drop_shield()
-        self.drop_shield_timer = bs.Timer(8.001, bs.WeakCall(self.drop_shield),
+        self.drop_shield_timer = bs.Timer(8.001, babase.WeakCallPartial(self.drop_shield),
                                           repeat=True)
 
         shared = SharedObjects.get()
@@ -459,7 +459,7 @@ class QuakeGame(bs.TeamGameActivity[Player, Team]):
                 delete_light()
                 del_checker()
 
-        self._checker = bs.Timer(0.1, babase.Call(check_exists), repeat=True)
+        self._checker = bs.Timer(0.1, babase.CallPartial(check_exists), repeat=True)
 
         def del_checker():
             if self._checker is not None:
@@ -469,8 +469,8 @@ class QuakeGame(bs.TeamGameActivity[Player, Team]):
             if p_light.exists():
                 p_light.delete()
 
-        bs.timer(6.9, babase.Call(del_checker))
-        bs.timer(7.0, babase.Call(delete_light))
+        bs.timer(6.9, babase.CallPartial(del_checker))
+        bs.timer(7.0, babase.CallPartial(delete_light))
 
     def spawn_player(self, player: bs.Player):
         spaz = self.spawn_player_spaz(player)

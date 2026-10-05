@@ -506,7 +506,7 @@ class BetterEliminationGame(bs.TeamGameActivity[Player, Team]):
     def spawn_player(self, player: Player) -> bs.Actor:
         actor = self.spawn_player_spaz(player, self._get_spawn_point(player))
         if not self._solo_mode:
-            bs.timer(0.3, babase.Call(self._print_lives, player))
+            bs.timer(0.3, babase.CallPartial(self._print_lives, player))
 
         # If we have any icons, update their state.
         for icon in player.icons:

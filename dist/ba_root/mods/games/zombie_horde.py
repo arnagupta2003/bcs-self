@@ -110,7 +110,7 @@ class zBotSet(SpazBotSet):
     def start_moving(self) -> None:
         """Start processing bot AI updates so they start doing their thing."""
         self._bot_update_timer = bs.Timer(0.05,
-                                          bs.WeakCall(self.zUpdate),
+                                          babase.WeakCallPartial(self.zUpdate),
                                           repeat=True)
 
     def zUpdate(self) -> None:
@@ -510,7 +510,7 @@ class ZombieHorde(bs.TeamGameActivity[Player, Team]):
         bs.timer(0.5, light.delete)
 
         if not self._solo_mode:
-            bs.timer(0.3, babase.Call(self._print_lives, player))
+            bs.timer(0.3, babase.CallPartial(self._print_lives, player))
 
         for icon in player.icons:
             icon.handle_player_spawned()
@@ -544,7 +544,7 @@ class ZombieHorde(bs.TeamGameActivity[Player, Team]):
         if player.actor and not self.has_ended():
             from bascenev1lib.actor.respawnicon import RespawnIcon
             player.customdata['respawn_timer'] = bs.Timer(
-                respawn_time, bs.WeakCall(
+                respawn_time, babase.WeakCallPartial(
                     self.spawn_player_if_exists_as_zombie, player))
             player.customdata['respawn_icon'] = RespawnIcon(
                 player, respawn_time)
@@ -601,7 +601,7 @@ class ZombieHorde(bs.TeamGameActivity[Player, Team]):
         bs.timer(0.5, light.delete)
 
         if not self._solo_mode:
-            bs.timer(0.3, babase.Call(self._print_lives, player))
+            bs.timer(0.3, babase.CallPartial(self._print_lives, player))
 
         for icon in player.icons:
             icon.handle_player_spawned()
@@ -744,7 +744,7 @@ class ZombieHorde(bs.TeamGameActivity[Player, Team]):
         thePt = list(self.get_random_point_in_play())
         thePt2 = self.map.get_ffa_start_position(self.players)
         thePt[1] = thePt2[1]
-        bs.timer(0.1, babase.Call(
+        bs.timer(0.1, babase.CallPartial(
             self._bots.spawn_bot, BrawlerBot, pos=thePt, spawn_time=1.0))
 
     def _onSpazBotDied(self, DeathMsg) -> None:

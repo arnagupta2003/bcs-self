@@ -193,7 +193,7 @@ class BlockDashGame(EliminationGame):
                                         enable_bomb=False,
                                         enable_pickup=False)
         if not self._solo_mode:
-            bs.timer(0.3, babase.Call(self._print_lives, player))
+            bs.timer(0.3, babase.CallPartial(self._print_lives, player))
 
         # If we have any icons, update their state.
         for icon in player.icons:
@@ -362,7 +362,7 @@ class BlockDashGame(EliminationGame):
 
         ud_1_r.connectattr('position', mnode, 'input2')
         mnode.connectattr('output', node, 'position')
-        bs.timer(8,babase.Call(self.create_block_wall_easy))
+        bs.timer(8,babase.CallPartial(self.create_block_wall_easy))
         self.gate_count=4
         self.wall_count=0
 
@@ -379,8 +379,8 @@ class BlockDashGame(EliminationGame):
         for i in range(0,7):
             self.create_block(x,0.4)
             x=x+0.85
-        bs.timer(1.5,babase.Call(self.create_wall))
-        bs.timer(15,babase.Call(self.create_block_wall_hardest))
+        bs.timer(1.5,babase.CallPartial(self.create_wall))
+        bs.timer(15,babase.CallPartial(self.create_block_wall_hardest))
 
     def create_block_wall_hard(self):
         x=-9
@@ -389,9 +389,9 @@ class BlockDashGame(EliminationGame):
             self.create_block(x,0.4)
             x=x+0.85
         if self.wall_count <4:
-            bs.timer(12,babase.Call(self.create_block_wall_hard))
+            bs.timer(12,babase.CallPartial(self.create_block_wall_hard))
         else:
-            bs.timer(7,babase.Call(self.create_block_wall_hard))  #hardest too heavy to play
+            bs.timer(7,babase.CallPartial(self.create_block_wall_hard))  #hardest too heavy to play
 
 
     def create_block_wall_easy(self):
@@ -406,10 +406,10 @@ class BlockDashGame(EliminationGame):
             x=x+0.85
         self.wall_count+=1
         if self.wall_count < 5:
-            bs.timer(11,babase.Call(self.create_block_wall_easy))
+            bs.timer(11,babase.CallPartial(self.create_block_wall_easy))
         else:
             self.wall_count=0
-            bs.timer(15,babase.Call(self.create_block_wall_hard))
+            bs.timer(15,babase.CallPartial(self.create_block_wall_hard))
 
 
 
@@ -476,4 +476,4 @@ class BlockDashGame(EliminationGame):
             })
         _rcombine.connectattr('output',ud_1_r,'position')
 
-        bs.timer(11,babase.Call(ud_1_r.delete))
+        bs.timer(11,babase.CallPartial(ud_1_r.delete))

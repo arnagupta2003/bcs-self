@@ -5,7 +5,7 @@ import _bascenev1
 from stats import mystats
 
 import bascenev1 as bs
-from babase._general import Call
+from babase import CallPartial
 from .handlers import send
 
 Commands = ['me', 'list', 'uniqeid', 'ping']
@@ -67,7 +67,7 @@ def stats(ac_id, clientid):
     else:
         reply = "Not played any match yet."
 
-    _babase.pushcall(Call(send, reply, clientid), from_other_thread=True)
+    _babase.pushcall(CallPartial(send, reply, clientid), from_other_thread=True)
 
 
 def fetch_send_stats(ac_id, clientid):

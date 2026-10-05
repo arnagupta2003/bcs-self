@@ -17,12 +17,12 @@ class GFGame(EliminationGame):
     def spawn_player(self, player):
         actor = self.spawn_player_spaz(player, (0, 5, 0))
         if not self._solo_mode:
-            bs.timer(0.3, babase.Call(self._print_lives, player))
+            bs.timer(0.3, babase.CallPartial(self._print_lives, player))
 
         # If we have any icons, update their state.
         for icon in player.icons:
             icon.handle_player_spawned()
-        bs.timer(1, babase.Call(self.raise_player, player))
+        bs.timer(1, babase.CallPartial(self.raise_player, player))
         return actor
 
     def raise_player(self, player):
@@ -32,4 +32,4 @@ class GFGame(EliminationGame):
                     "impulse", player.actor.node.position[0], player.actor.node.position[1]+.5, player.actor.node.position[2], 0, 5, 0, 3, 10, 0, 0, 0, 5, 0)
             except:
                 pass
-            bs.timer(0.05, babase.Call(self.raise_player, player))
+            bs.timer(0.05, babase.CallPartial(self.raise_player, player))

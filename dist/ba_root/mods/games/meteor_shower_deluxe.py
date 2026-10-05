@@ -56,7 +56,7 @@ class NewMeteorShowerGame(MeteorShowerGame):
                 random.uniform(-3.066, -4.12),
                 (-5 + random.random() * forcez) * dropdirz,
             )
-            bs.timer(delay, babase.Call(self._drop_bomb, pos, vel))
+            bs.timer(delay, babase.CallPartial(self._drop_bomb, pos, vel))
             delay += 0.1
         self._set_meteor_timer()
 

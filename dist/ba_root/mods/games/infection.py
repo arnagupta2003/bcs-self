@@ -218,13 +218,13 @@ class Infection(bs.TeamGameActivity[Player, Team]):
         self._start_time = bs.time()
         self.mine_count = 0
         bs.timer(self._update_rate,
-                 bs.WeakCall(self._mine_update),
+                 babase.WeakCallPartial(self._mine_update),
                  repeat=True)
         bs.timer(self._max_size_increases*1.0,
-                 bs.WeakCall(self._max_size_update),
+                 babase.WeakCallPartial(self._max_size_update),
                  repeat=True)
         bs.timer(self._extra_mines*1.0,
-                 bs.WeakCall(self._max_mine_update),
+                 babase.WeakCallPartial(self._max_mine_update),
                  repeat=True)
         self._timer = OnScreenTimer()
         self._timer.start()
@@ -287,7 +287,7 @@ class Infection(bs.TeamGameActivity[Player, Team]):
             pos = self.getRandomPowerupPoint()
             self.mine_count += 1
             self._flash_mine(pos)
-            bs.timer(0.95, babase.Call(self._make_mine, pos))
+            bs.timer(0.95, babase.CallPartial(self._make_mine, pos))
 
     def _make_mine(self, posn: Sequence[float]) -> None:
         m = myMine(pos=posn)

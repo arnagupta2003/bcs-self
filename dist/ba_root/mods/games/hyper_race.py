@@ -436,7 +436,7 @@ class NewBomb(Bomb):
 
         # We blew up so we need to go away.
         # NOTE TO SELF: do we actually need this delay?
-        bs.timer(0.001, bs.WeakCall(self.handlemessage, bs.DieMessage()))
+        bs.timer(0.001, babase.WeakCallPartial(self.handlemessage, bs.DieMessage()))
 
 
 class TNT(bs.Actor):
@@ -966,59 +966,59 @@ class RaceGame(bs.TeamGameActivity[Player, Team]):
         self._tnt((-7, 5, -1), (0, 0, 0), 1.3)
         self._tnt((-6, 5, 1), (0, 0, 0), 1.3)
 
-        bs.timer(0.1, bs.WeakCall(self._tnt, (-3.2, 5, 1),
+        bs.timer(0.1, babase.WeakCallPartial(self._tnt, (-3.2, 5, 1),
                                   (0, 0, 0), 1.0, (0, 20, 60)), repeat=True)
 
-        bs.timer(1.6, bs.WeakCall(self._bomb, 'impact',
+        bs.timer(1.6, babase.WeakCallPartial(self._bomb, 'impact',
                                   (6, 7, 1), (0, 0, 0), 1.0, 1.0), repeat=True)
-        bs.timer(1.6, bs.WeakCall(self._bomb, 'impact',
+        bs.timer(1.6, babase.WeakCallPartial(self._bomb, 'impact',
                                   (6.8, 7, 1), (0, 0, 0), 1.0, 1.0), repeat=True)
-        bs.timer(1.6, bs.WeakCall(self._bomb, 'impact',
+        bs.timer(1.6, babase.WeakCallPartial(self._bomb, 'impact',
                                   (7.6, 7, 1), (0, 0, 0), 1.0, 1.0), repeat=True)
 
-        bs.timer(1.6, bs.WeakCall(self._bomb, 'impact',
+        bs.timer(1.6, babase.WeakCallPartial(self._bomb, 'impact',
                                   (6, 7, -2.2), (0, 0, 0), 1.0, 1.0), repeat=True)
-        bs.timer(1.6, bs.WeakCall(self._bomb, 'impact',
+        bs.timer(1.6, babase.WeakCallPartial(self._bomb, 'impact',
                                   (6.8, 7, -2.2), (0, 0, 0), 1.0, 1.0), repeat=True)
-        bs.timer(1.6, bs.WeakCall(self._bomb, 'impact',
+        bs.timer(1.6, babase.WeakCallPartial(self._bomb, 'impact',
                                   (7.6, 7, -2.2), (0, 0, 0), 1.0, 1.0), repeat=True)
 
-        bs.timer(1.6, bs.WeakCall(self._bomb, 'impact',
+        bs.timer(1.6, babase.WeakCallPartial(self._bomb, 'impact',
                                   (6, 7, -5.2), (0, 0, 0), 1.0, 1.0), repeat=True)
-        bs.timer(1.6, bs.WeakCall(self._bomb, 'impact',
+        bs.timer(1.6, babase.WeakCallPartial(self._bomb, 'impact',
                                   (6.8, 7, -5.2), (0, 0, 0), 1.0, 1.0), repeat=True)
-        bs.timer(1.6, bs.WeakCall(self._bomb, 'impact',
+        bs.timer(1.6, babase.WeakCallPartial(self._bomb, 'impact',
                                   (7.6, 7, -5.2), (0, 0, 0), 1.0, 1.0), repeat=True)
 
-        bs.timer(1.6, bs.WeakCall(self._bomb, 'impact',
+        bs.timer(1.6, babase.WeakCallPartial(self._bomb, 'impact',
                                   (6, 7, -8), (0, 0, 0), 1.0, 1.0), repeat=True)
-        bs.timer(1.6, bs.WeakCall(self._bomb, 'impact',
+        bs.timer(1.6, babase.WeakCallPartial(self._bomb, 'impact',
                                   (6.8, 7, -8), (0, 0, 0), 1.0, 1.0), repeat=True)
-        bs.timer(1.6, bs.WeakCall(self._bomb, 'impact',
+        bs.timer(1.6, babase.WeakCallPartial(self._bomb, 'impact',
                                   (7.6, 7, -8), (0, 0, 0), 1.0, 1.0), repeat=True)
 
-        bs.timer(1.6, bs.WeakCall(self._bomb, 'impact',
+        bs.timer(1.6, babase.WeakCallPartial(self._bomb, 'impact',
                                   (-5, 5, 0), (0, 0, 0), 1.0, 1.0, (0, 20, 3)), repeat=True)
-        bs.timer(1.6, bs.WeakCall(self._bomb, 'impact',
+        bs.timer(1.6, babase.WeakCallPartial(self._bomb, 'impact',
                                   (-1.5, 5, 0), (0, 0, 0), 1.0, 1.0, (0, 20, 3)), repeat=True)
 
-        bs.timer(1.6, bs.WeakCall(self._bomb, 'sticky',
+        bs.timer(1.6, babase.WeakCallPartial(self._bomb, 'sticky',
                                   (-1, 5, -8), (0, 10, 0), 1.0, 1.0), repeat=True)
-        bs.timer(1.6, bs.WeakCall(self._bomb, 'sticky',
+        bs.timer(1.6, babase.WeakCallPartial(self._bomb, 'sticky',
                                   (-1, 5, -9), (0, 10, 0), 1.0, 1.0), repeat=True)
-        bs.timer(1.6, bs.WeakCall(self._bomb, 'sticky',
+        bs.timer(1.6, babase.WeakCallPartial(self._bomb, 'sticky',
                                   (-1, 5, -10), (0, 10, 0), 1.0, 1.0), repeat=True)
 
-        bs.timer(1.6, bs.WeakCall(self._bomb, 'sticky',
+        bs.timer(1.6, babase.WeakCallPartial(self._bomb, 'sticky',
                                   (-4.6, 5, -8), (0, 10, 0), 1.0, 1.0), repeat=True)
-        bs.timer(1.6, bs.WeakCall(self._bomb, 'sticky',
+        bs.timer(1.6, babase.WeakCallPartial(self._bomb, 'sticky',
                                   (-4.6, 5, -9), (0, 10, 0), 1.0, 1.0), repeat=True)
-        bs.timer(1.6, bs.WeakCall(self._bomb, 'sticky',
+        bs.timer(1.6, babase.WeakCallPartial(self._bomb, 'sticky',
                                   (-4.6, 5, -10), (0, 10, 0), 1.0, 1.0), repeat=True)
 
-        bs.timer(1.6, bs.WeakCall(
+        bs.timer(1.6, babase.WeakCallPartial(
             self._powerup, (2, 5, -5), 'curse', (0, 20, -3)), repeat=True)
-        bs.timer(1.6, bs.WeakCall(
+        bs.timer(1.6, babase.WeakCallPartial(
             self._powerup, (4, 5, -5), 'curse', (0, 20, -3)), repeat=True)
 
     def _tnt(self,

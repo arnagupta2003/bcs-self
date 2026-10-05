@@ -127,7 +127,7 @@ class AvalanchaGame(MeteorShowerGame):
             pos = (pos[0], pos[1] + 0.4, pos[2])
             dropdir = -1.0 if pos[0] > 0 else 1.0
             vel = (random.randrange(-4, 4), 7.0, random.randrange(0, 4))
-            bs.timer(delay, babase.Call(self._drop_bomb, pos, vel))
+            bs.timer(delay, babase.CallPartial(self._drop_bomb, pos, vel))
             delay += 0.1
         self._set_meteor_timer()
 

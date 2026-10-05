@@ -99,7 +99,7 @@ class Ball(bs.Actor):
         )
 
         # die the ball manually incase the ball doesn't fall the outside of the map
-        bs.timer(2.5, bs.WeakCall(self.handlemessage, bs.DieMessage()))
+        bs.timer(2.5, babase.WeakCallPartial(self.handlemessage, bs.DieMessage()))
 
     # i am not handling anything in this ball Class(except for diemessage).
     # all game things and logics going to be in the box class

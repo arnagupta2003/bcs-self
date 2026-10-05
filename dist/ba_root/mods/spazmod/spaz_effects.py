@@ -34,7 +34,7 @@ def effect(repeat_interval=0):
                     else:
                         raise
 
-            effect_activation = bs.Timer(repeat_interval, babase.Call(_caller),
+            effect_activation = bs.Timer(repeat_interval, babase.CallPartial(_caller),
                                          repeat=repeat_interval > 0)
             self._activations.append(effect_activation)
 
@@ -54,7 +54,7 @@ def node(check_interval=0):
                     node.delete()
                     self._activations = []
 
-            node_activation = bs.Timer(check_interval, babase.Call(_caller),
+            node_activation = bs.Timer(check_interval, babase.CallPartial(_caller),
                                        repeat=check_interval > 0)
             try:
                 self._activations.append(node_activation)
@@ -86,7 +86,7 @@ class NewPlayerSpaz(PlayerSpaz):
         self._activations = []
         self.effects = []
 
-        babase._asyncio._asyncio_event_loop.create_task(self.set_effects())
+        babase._asyncio._g_asyncio_event_loop.create_task(self.set_effects())
 
     async def set_effects(self):
         try:
