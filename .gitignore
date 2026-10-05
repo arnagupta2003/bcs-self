@@ -9,4 +9,6 @@ dist/ba_root/mods/serverdata/*.log
 dist/ba_root/mods/serverdata/*.log*
 dist/ba_root/mods/serverdata/*.json
 dist/ba_root/mods/stats/*.json
+.env
+.admin-backups/
 

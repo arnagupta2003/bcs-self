@@ -56,6 +56,22 @@ Starting the server
 ```
 If ports are open, you can connect to your server now.
 
+## Admin Console
+
+The web console configures the server and its mods, edits roles and moderation data, and can start, stop, or restart the server. It runs on TCP port 8080; BombSquad gameplay remains on UDP port 43210.
+
+For Docker Compose, copy `.env.example` to `.env`, replace `ADMIN_UI_PASSWORD` with a unique password of at least 14 characters, then run:
+
+```
+docker compose up --build -d
+```
+
+Open [http://localhost:8080](http://localhost:8080) and sign in with that password. The Compose setup binds the admin port to localhost only and persists the editable configuration, player data, logs, stats, and automatic pre-change backups in the repository. Do not expose port 8080 directly to the public internet; use a VPN or a TLS reverse proxy for remote access. Set `ADMIN_UI_SECURE_COOKIE=1` when accessing it through HTTPS.
+
+Set `ADMIN_UI_START_SERVER=0` in `.env` to launch the console without starting the game process; settings can still be edited and saved, and the console will leave the server stopped until you choose **Start**.
+
+To run the console outside Docker, set `ADMIN_UI_PASSWORD` in the environment and run `python3 admin_panel.py`. Set `ADMIN_UI_HOST` and `ADMIN_UI_PORT` to change its bind address and port.
+
 ___
 ### More Configuration
 Open `dist/ba_root/mods/setting.json` in your prefered editor and change values according to you.

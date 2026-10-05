@@ -1,0 +1,5 @@
+.git
+.env
+.admin-backups/
+**/__pycache__/
+*.py[cod]

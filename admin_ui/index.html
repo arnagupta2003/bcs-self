@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <title>BombSquad Server Console</title>
+    <link rel="stylesheet" href="/assets/styles.css">
+    <script src="/assets/app.js" defer></script>
+  </head>
+  <body>
+    <section id="login-screen" class="login-screen" aria-labelledby="login-title">
+      <div class="login-mark" aria-hidden="true">BS</div>
+      <p class="eyebrow">BALLISTICA / SERVER OPERATIONS</p>
+      <h1 id="login-title">Server console</h1>
+      <p class="login-copy">Sign in to manage your BombSquad instance.</p>
+      <form id="login-form" class="login-form">
+        <label for="login-password">Admin password</label>
+        <input id="login-password" name="password" type="password" autocomplete="current-password" required>
+        <button class="button button-primary" type="submit">Sign in</button>
+        <p id="login-error" class="form-error" role="alert"></p>
+      </form>
+      <p class="login-foot">Private control plane · Port 8080</p>
+    </section>
+
+    <div id="console" class="console-shell" hidden>
+      <aside class="sidebar">
+        <a class="brand" href="#overview" aria-label="BombSquad server console home">
+          <span class="brand-mark">BS</span>
+          <span><strong>Ballistica</strong><small>SERVER CONTROL</small></span>
+        </a>
+        <div class="side-caption">MANAGEMENT</div>
+        <nav class="primary-nav" aria-label="Main navigation">
+          <button class="nav-item active" type="button" data-page="overview"><span class="nav-glyph">01</span>Overview</button>
+          <button class="nav-item" type="button" data-page="server"><span class="nav-glyph">02</span>Server setup</button>
+          <button class="nav-item" type="button" data-page="mods"><span class="nav-glyph">03</span>Mod settings</button>
+          <button class="nav-item" type="button" data-page="access"><span class="nav-glyph">04</span>Roles &amp; bans</button>
+        </nav>
+        <div class="sidebar-bottom">
+          <span class="sidebar-rule"></span>
+          <span class="eyebrow">INSTANCE</span>
+          <strong id="sidebar-name">Loading server…</strong>
+          <span id="sidebar-port" class="muted">Game port 43210</span>
+          <button id="logout-button" class="text-button" type="button">Sign out</button>
+        </div>
+      </aside>
+
+      <main class="main-area">
+        <header class="topbar">
+          <div class="breadcrumb"><span>CONTROL ROOM</span><span class="crumb-divider">/</span><strong id="current-section">Overview</strong></div>
+          <div class="topbar-right">
+            <span id="server-status" class="status-badge status-offline"><span class="status-dot"></span>Server offline</span>
+            <button class="button button-primary save-button" type="button" data-save>Save &amp; restart</button>
+          </div>
+        </header>
+
+        <div class="page-wrap">
+          <section class="page-view" data-view="overview">
+            <div class="page-heading overview-heading">
+              <div>
+                <p class="eyebrow">LIVE INSTANCE</p>
+                <h1 id="overview-name">BombSquad server</h1>
+                <p class="subheading">Configuration and process controls for your dedicated server.</p>
+              </div>
+              <div class="process-actions">
+                <button class="button button-quiet" type="button" data-server-action="start">Start</button>
+                <button class="button button-quiet" type="button" data-server-action="stop">Stop</button>
+                <button class="button button-accent" type="button" data-server-action="restart">Restart</button>
+              </div>
+            </div>
+
+            <div class="overview-grid">
+              <article class="metric-panel metric-primary"><div class="metric-label">SERVER PROCESS</div><div id="overview-status" class="metric-value">Checking…</div><div id="overview-pid" class="metric-note">Waiting for status</div></article>
+              <article class="metric-panel"><div class="metric-label">GAME PORT</div><div id="overview-port" class="metric-value">43210</div><div class="metric-note">UDP gameplay · TCP services</div></article>
+              <article class="metric-panel"><div class="metric-label">SESSION</div><div id="overview-session" class="metric-value">—</div><div id="overview-playlist" class="metric-note">Playlist not loaded</div></article>
+            </div>
+
+            <div class="overview-lower">
+              <section class="content-section quick-section">
+                <div class="section-heading"><div><p class="eyebrow">QUICK CONFIGURATION</p><h2>Server identity</h2></div><button class="link-button" type="button" data-open-page="server">Edit settings <span aria-hidden="true">→</span></button></div>
+                <div id="quick-config" class="quick-config"></div>
+              </section>
+              <section class="content-section service-section">
+                <div class="section-heading"><div><p class="eyebrow">SERVICE MAP</p><h2>Ports &amp; access</h2></div></div>
+                <div class="service-row"><span class="service-indicator game"></span><span><strong>BombSquad</strong><small>Gameplay transport</small></span><code id="service-game-port">UDP 43210</code></div>
+                <div class="service-row"><span class="service-indicator admin"></span><span><strong>Admin console</strong><small>Private web control</small></span><code>TCP 8080</code></div>
+                <p class="security-note">Keep the admin port private. Use a VPN or TLS reverse proxy for remote access.</p>
+              </section>
+            </div>
+          </section>
+
+          <section class="page-view" data-view="server" hidden>
+            <div class="page-heading"><div><p class="eyebrow">SERVER CONFIGURATION</p><h1>Server setup</h1><p class="subheading">Identity, networking, playlist, and runtime behavior.</p></div></div>
+            <div id="server-settings" class="settings-groups"></div>
+          </section>
+
+          <section class="page-view" data-view="mods" hidden>
+            <div class="page-heading"><div><p class="eyebrow">BALLISTICA MODS</p><h1>Mod settings</h1><p class="subheading">Every editable value from the server’s mod configuration.</p></div></div>
+            <div id="mod-settings" class="settings-tree"></div>
+          </section>
+
+          <section class="page-view" data-view="access" hidden>
+            <div class="page-heading"><div><p class="eyebrow">PLAYER ADMINISTRATION</p><h1>Roles &amp; bans</h1><p class="subheading">Edit custom role definitions and the active moderation list.</p></div></div>
+            <div class="json-editors">
+              <section class="content-section json-section">
+                <div class="section-heading"><div><p class="eyebrow">CUSTOM PERMISSIONS</p><h2>Roles</h2></div></div>
+                <label for="roles-json">Role definitions</label>
+                <textarea id="roles-json" class="json-editor" spellcheck="false"></textarea>
+                <p class="field-help">Role tags, account IDs, and allowed chat commands. Enter valid JSON.</p>
+              </section>
+              <section class="content-section json-section">
+                <div class="section-heading"><div><p class="eyebrow">PLAYER RESTRICTIONS</p><h2>Blacklist</h2></div></div>
+                <label for="blacklist-json">Bans, mutes, and vote restrictions</label>
+                <textarea id="blacklist-json" class="json-editor" spellcheck="false"></textarea>
+                <p class="field-help">Changes apply after restart. Player identifiers are sensitive; keep this console private.</p>
+              </section>
+            </div>
+          </section>
+          <div id="toast" class="toast" role="status" aria-live="polite"></div>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

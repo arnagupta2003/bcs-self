@@ -1,0 +1,21 @@
+services:
+  bombsquad:
+    build: .
+    image: bombsquad-server:local
+    restart: unless-stopped
+    stop_grace_period: 45s
+    environment:
+      ADMIN_UI_PASSWORD: ${ADMIN_UI_PASSWORD:?Set ADMIN_UI_PASSWORD in .env}
+      ADMIN_UI_HOST: 0.0.0.0
+      ADMIN_UI_SECURE_COOKIE: ${ADMIN_UI_SECURE_COOKIE:-0}
+      ADMIN_UI_START_SERVER: ${ADMIN_UI_START_SERVER:-1}
+    ports:
+      - "43210:43210/udp"
+      - "127.0.0.1:8080:8080/tcp"
+    volumes:
+      - ./config.json:/app/config.json
+      - ./dist/ba_root/mods/setting.json:/app/dist/ba_root/mods/setting.json
+      - ./dist/ba_root/mods/playersdata:/app/dist/ba_root/mods/playersdata
+      - ./dist/ba_root/mods/serverdata:/app/dist/ba_root/mods/serverdata
+      - ./dist/ba_root/mods/stats:/app/dist/ba_root/mods/stats
+      - ./.admin-backups:/app/.admin-backups

@@ -18,9 +18,13 @@ COPY . /app
 # Ensure execution permissions for the server binaries
 RUN chmod +x bombsquad_server dist/bombsquad_headless
 
-# Expose BombSquad default ports (TCP and UDP)
+# Expose BombSquad gameplay and the private admin console.
 EXPOSE 43210/udp
-EXPOSE 43210/tcp
+EXPOSE 8080/tcp
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 CMD curl -fsS http://127.0.0.1:8080/healthz || exit 1
 
-# Run the modded server script
-CMD ["./bombsquad_server"]
+ENV ADMIN_UI_HOST=0.0.0.0
+ENV PYTHONUNBUFFERED=1
+
+# The admin panel supervises the normal BombSquad server manager.
+CMD ["python3", "admin_panel.py"]
